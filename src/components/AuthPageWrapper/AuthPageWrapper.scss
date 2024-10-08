@@ -1,17 +1,5 @@
-.page-container {
-    min-height: 100vh;
-    height: 100%;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
 .auth-page-wrapper {
-    width: clamp(350px, 100%, 450px);
-
-    margin: auto;
-    margin-top: 70px;
+    width: clamp(350px, 100%, 550px);
 
     & .page-content {
         padding: 2rem;
@@ -25,10 +13,6 @@
             flex-direction: column;
             justify-content: center;
             text-align: center;
-
-            & .diamond-icon {
-                font-size: 45px;
-            }
         }
     }
 }

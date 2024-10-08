@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const host: string = 'http://fafafda.fdsfa/';
+const host: string = 'http://localhost:3000';
 
 function constructFullUrl(endpoint: string): string {
   return host + endpoint;
@@ -14,7 +14,7 @@ function get(
     axios
       .get(constructFullUrl(url), { params })
       .then(response => {
-        resolve(response);
+        resolve(response?.data ? response.data : response);
       })
       .catch(error => {
         setTimeout(() => {
@@ -37,7 +37,7 @@ function post(
         { params }
       )
       .then(response => {
-        resolve(response);
+        resolve(response?.data ? response.data : response);
       })
       .catch(error => {
         setTimeout(() => {

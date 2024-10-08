@@ -3,10 +3,8 @@
 /* FONT FAMILY */
 @import "./assets/fonts/roboto/roboto.css";
 
-@import "primereact/resources/themes/mdc-light-indigo/theme.css" layer(primeReact);
+@import "primereact/resources/themes/lara-light-blue/theme.css" layer(primeReact);
 @import "bootstrap/dist/css/bootstrap.css" layer(bootstrap);
-
-@import './utils/custom.scss';
 
 body {
   margin: 0;

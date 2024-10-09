@@ -4,6 +4,8 @@ import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
+import CreateNewChat from "../CreateNewChat/CreateNewChat";
+import { Button } from "primereact/button";
 
 export default function ChatList() {
   const [showLoading, setShowLoading] = useState(false);
@@ -15,12 +17,8 @@ export default function ChatList() {
 
   useEffect(() => {
     setShowLoading(true);
-    const params = {
-      userId: userData.id,
-    };
-
     httpServices
-      .get(API_ENDPOINT_CONSTANTS.CHATS, params)
+      .get(API_ENDPOINT_CONSTANTS.CHATS)
       .then((response) => {
         if (response["status"] == "success") {
           setChatList(response["data"]);
@@ -37,5 +35,24 @@ export default function ChatList() {
       .finally(() => setShowLoading(false));
   }, [userData.id]);
 
-  return <div>ChatList</div>;
+  return (
+    <div className="bg-white overflow-hidden p-3 rounded-4">
+      <div>
+        <CreateNewChat />
+      </div>
+
+      <div>
+        {chatList.map((x: any) => {
+          return (
+            <Button text>
+              <div className="row">
+                <div className="col-2"></div>
+                <div className="col-10">{x?.name}</div>
+              </div>
+            </Button>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

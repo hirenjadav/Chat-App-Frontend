@@ -1,0 +1,17 @@
+.chat-home-container {
+  flex: 0 0 100%;
+  display: flex;
+  column-gap: 20px;
+
+  & .chat-list {
+    flex: 0 0 350px;
+    
+  }
+
+  & .single-chat {
+    flex-grow: 1;
+    border-radius: 20px;
+    padding: 15px;
+    background-color: #e6e6e6;
+  }
+}

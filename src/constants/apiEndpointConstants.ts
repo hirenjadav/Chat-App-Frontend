@@ -3,7 +3,9 @@ enum API_ENDPOINT_CONSTANTS {
   LOGOUT = '/auth/logout',
   SIGN_UP = '/auth/signup',
 
-  CHATS = "/conv"
+  CHATS = "/conv",
+
+  FRIENDS = "/friend",
 }
 
 export default API_ENDPOINT_CONSTANTS;

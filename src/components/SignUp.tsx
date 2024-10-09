@@ -1,15 +1,22 @@
 import { InputText } from "primereact/inputtext";
 import { Password } from "primereact/password";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FontIconWrapper from "./FontIconWrapper";
 import { Button } from "primereact/button";
 import httpServices from "../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../constants/apiEndpointConstants";
 import { Toast } from "primereact/toast";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const userData = localStorage.getItem("userData");
+    if (userData) navigate("/chat");
+  });
 
   const [signUpCredential, setsignUpCredential] = useState({
     firstName: "",
@@ -84,6 +91,8 @@ export default function SignUp() {
         console.log(response);
         if (response["status"] == "success") {
           localStorage.setItem("userData", JSON.stringify(response["data"]));
+          localStorage.setItem("token", response["data"]["accessToken"]);
+          navigate("/chat");
         } else {
           toast.current?.show({
             severity: "error",

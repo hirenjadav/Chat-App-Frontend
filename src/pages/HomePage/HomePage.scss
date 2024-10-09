@@ -1,0 +1,18 @@
+.auth-page-wrapper {
+  width: clamp(350px, 100%, 550px);
+
+  & .page-content {
+      padding: 2rem;
+
+      background-color: white;
+      border: 1px solid black;
+      border-radius: 10px;
+
+      & .page-title {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          text-align: center;
+      }
+  }
+}

@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import "./AuthPageWrapper.scss";
+import "./HomePage.scss";
 
-export default function AuthPageWrapper() {
+export default function HomePage() {
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState("");
 

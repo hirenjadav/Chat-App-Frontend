@@ -11,15 +11,26 @@ function get(
   params: any = null
 ): Promise<any> {
   return new Promise<any>(resolve => {
+    const headers: any = {};
+    if(localStorage.getItem('token')) {
+      const accessToken: string = localStorage.getItem('token')!;
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    if(localStorage.getItem('userData')) {
+      const userData: any = JSON.parse(localStorage.getItem('userData')!);
+      params = {
+        ...params,
+        userId: userData.id
+      }
+    }
+
     axios
-      .get(constructFullUrl(url), { params })
+      .get(constructFullUrl(url), { params, headers })
       .then(response => {
         resolve(response?.data ? response.data : response);
       })
       .catch(error => {
-        setTimeout(() => {
-          resolve(error);
-        }, 5000);
+        resolve(error);
       })
   });
 }
@@ -30,19 +41,30 @@ function post(
   params: any = null
 ): Promise<any> {
   return new Promise<any>(resolve => {
+    const headers: any = {};
+    if(localStorage.getItem('token')) {
+      const accessToken: string = localStorage.getItem('token')!;
+      headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    if(localStorage.getItem('userData')) {
+      const userData: any = localStorage.getItem('userData')!;
+      params = {
+        ...params,
+        userId: userData.id
+      }
+    }
+
     axios
       .post(
         constructFullUrl(url),
         args,
-        { params }
+        { params, headers }
       )
       .then(response => {
         resolve(response?.data ? response.data : response);
       })
       .catch(error => {
-        setTimeout(() => {
-          resolve(error);
-        }, 5000);
+        resolve(error);
       })
   });
 }

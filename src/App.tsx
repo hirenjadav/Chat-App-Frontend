@@ -5,19 +5,24 @@ import {
   Navigate,
 } from "react-router-dom";
 import SignUp from "./components/SignUp";
-import SignIn from "./components/Login/Login";
-import AuthPageWrapper from "./components/AuthPageWrapper/AuthPageWrapper";
 import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
+import HomePage from "./pages/HomePage/HomePage";
+import Login from "./components/Login/Login";
+import ChatHomePage from "./pages/ChatHomePage/ChatHomePage";
+import SingleChat from "./components/SingleChat/SingleChat";
 
 function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Navigate to="/auth/signin" replace />} />
-        <Route path="/auth" Component={AuthPageWrapper}>
-          <Route path="signin" Component={SignIn} />
+        <Route path="/" element={<Navigate to="/auth/login" replace />} />
+        <Route path="/auth" Component={HomePage}>
+          <Route path="login" Component={Login} />
           <Route path="signup" Component={SignUp} />
           <Route path="forgot-password" Component={ForgotPassword} />
+        </Route>
+        <Route path="/chat" Component={ChatHomePage}>
+          <Route path=":id" Component={SingleChat} />
         </Route>
       </Routes>
     </Router>

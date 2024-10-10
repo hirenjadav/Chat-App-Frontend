@@ -1,0 +1,17 @@
+.new-chat-input-wrapper {
+    position: relative;
+
+    & svg {
+        left: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        z-index: 1;
+    }
+
+    & .input-field {
+        padding-left: 40px;
+    }
+}

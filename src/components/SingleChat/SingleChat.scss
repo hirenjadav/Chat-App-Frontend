@@ -28,9 +28,33 @@
     }
   }
 
-  & .conversation-chat {
+  & .conversation-chats {
     flex-grow: 1;
     padding: 10px;
+    max-height: calc(100vh - 205px);
+    overflow: auto;
+
+    & .single-message-item {
+      background-color: white;
+      border-radius: 20px;
+      padding: 5px 15px 2px 15px;
+      width: fit-content;
+      margin-bottom: 15px;
+
+      &.left-side {
+        margin-right: auto;
+      }
+
+      &.right-side {
+        margin-left: auto;
+      }
+
+      & .message-time {
+        padding-right: 2px;
+        font-size: 10px;
+        text-align: right;
+      }
+    }
   }
 
   & .single-message-input-wrapper {

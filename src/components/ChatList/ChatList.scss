@@ -1,0 +1,65 @@
+.chat-list-container {
+    margin: 15px 0;
+    max-height: calc(100vh - 210px);
+    overflow-y: auto;
+}
+
+.chat-list-single-item {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    column-gap: 10px;
+    text-align: left;
+    border: none;
+    box-shadow: none;
+    outline: none;
+    background: transparent;
+    overflow: hidden;
+
+    & .single-item {
+
+        &-picture {
+            flex: 0 0 50px;
+            overflow: hidden;
+
+            & img {
+                height: 100%;
+                width: 100%;
+            } 
+
+        }
+
+        &-details {
+            display: flex;
+            flex-direction: column;
+            row-gap: 5px;
+
+            &-name {
+                font-size: 18px;
+                font-weight: 600;
+            }
+
+            &-message {
+                width: 300px;
+                font-size: 15px;
+                font-weight: 400;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+        }
+
+        &-status {
+
+            &-time {
+                font-size: 15px;
+                font-weight: 400;
+            }
+            
+            &-new-message {
+                font-size: 15px;
+                font-weight: 400;
+            }
+        }
+    }
+}

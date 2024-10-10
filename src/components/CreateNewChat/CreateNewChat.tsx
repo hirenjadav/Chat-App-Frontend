@@ -1,10 +1,11 @@
-import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AutoComplete } from "primereact/autocomplete";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
+import FontIconWrapper from "../FontIconWrapper";
+import "./CreateNewChat.scss"
 
 export default function CreateNewChat() {
   const [showLoading, setShowLoading] = useState(false);
@@ -39,12 +40,14 @@ export default function CreateNewChat() {
   };
 
   return (
-    <div>
+    <div className="new-chat-input-wrapper">
+      <FontIconWrapper icon="fa-solid fa-magnifying-glass" />
       <AutoComplete
         value={searchField}
         placeholder="Search Chat"
         className="w-100"
-        inputClassName="w-100 rounded-4"
+        loadingIcon="''"
+        inputClassName="w-100 rounded-5 input-field"
         suggestions={friendList}
         completeMethod={searchFriend}
         onChange={(e) => setSearchField(e.value)}

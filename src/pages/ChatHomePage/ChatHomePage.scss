@@ -1,7 +1,26 @@
+$sideBarWidth: 80px;
+
+.chat-sidebar-container {
+  flex: 0 0 $sideBarWidth;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 15px;
+  padding: 10px;
+
+  & .sidebar-button {
+    padding: 15px 13px;
+    font-size: 25px;
+    border-radius: 50%;
+  }
+}
+
 .chat-home-container {
-  flex: 0 0 100%;
+  flex: 0 0 calc(100% - $sideBarWidth);
   display: flex;
   column-gap: 20px;
+  padding: 10px 15px;
 
   & .chat-list {
     flex: 0 0 350px;

@@ -9,7 +9,6 @@ import ForgotPassword from "./components/ForgotPassword/ForgotPassword";
 import HomePage from "./pages/HomePage/HomePage";
 import Login from "./components/Login/Login";
 import ChatHomePage from "./pages/ChatHomePage/ChatHomePage";
-import SingleChat from "./components/SingleChat/SingleChat";
 
 function App() {
   return (
@@ -21,9 +20,9 @@ function App() {
           <Route path="signup" Component={SignUp} />
           <Route path="forgot-password" Component={ForgotPassword} />
         </Route>
-        <Route path="/chat" Component={ChatHomePage}>
-          <Route path=":id" Component={SingleChat} />
-        </Route>
+        <Route path="/chat" Component={ChatHomePage}></Route>
+        <Route path="/chat/new" Component={ChatHomePage}></Route>
+        <Route path="/chat/:id" Component={ChatHomePage}></Route>
       </Routes>
     </Router>
   );

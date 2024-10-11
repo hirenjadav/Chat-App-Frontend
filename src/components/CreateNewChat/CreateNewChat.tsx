@@ -5,12 +5,14 @@ import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import FontIconWrapper from "../FontIconWrapper";
 import "./CreateNewChat.scss";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateNewChat() {
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
   const [searchField, setSearchField] = useState("");
   const [userList, setuserList] = useState<any[]>([]);
+  const navigate = useNavigate();
 
   const phoneNumberRegExp: RegExp = /\b\d{10}\b/;
   const emailRegExp: RegExp =
@@ -28,15 +30,17 @@ export default function CreateNewChat() {
         if (response["status"] == "success") {
           const list: any[] = response["data"];
           if (!list.length) {
-            if (emailRegExp.test(searchValue)) {
-              list.push({
-                fullName: `Start chat with ${searchValue}`,
-                email: searchValue,
-              });
-            }
+            // if (emailRegExp.test(searchValue)) {
+            //   list.push({
+            //     id: null,
+            //     fullName: `Start chat with ${searchValue}`,
+            //     email: searchValue,
+            //   });
+            // }
 
             if (phoneNumberRegExp.test(searchValue)) {
               list.push({
+                id: null,
                 fullName: `Start chat with ${searchValue}`,
                 phoneNumber: searchValue,
               });
@@ -57,6 +61,11 @@ export default function CreateNewChat() {
   };
 
   const handleSuggestionSelect = (e) => {
+    if(e.value?.id) {
+      navigate('/chat/' + e.value.id);
+    } else {
+      navigate('/chat/new', { state: { phoneNumber: e.value.phoneNumber } });
+    }
     setSearchField("");
   };
 

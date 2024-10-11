@@ -4,8 +4,6 @@ import SingleChat from "../../components/SingleChat/SingleChat";
 import ChatSideBar from "../../components/ChatSideBar/ChatSideBar";
 
 export default function ChatHomePage() {
-  
-
   return (
     <div className="min-vh-100 h-100 d-flex">
       <div className="chat-sidebar-container">

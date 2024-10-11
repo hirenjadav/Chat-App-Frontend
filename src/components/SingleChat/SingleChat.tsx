@@ -21,6 +21,25 @@ export default function SingleChat() {
 
   const userid = "2a57e7b6-9c8c-4b77-9f5c-21c52a8b69c5";
 
+  useEffect(() => {
+    setShowLoading(true);
+    httpServices
+      .get(API_ENDPOINT_CONSTANTS.CHATS)
+      .then((response) => {
+        if (response["status"] == "success") {
+          setMessageList(response["data"]);
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  }, [userData.id]);
 
   return (
     <div className="single-chat-container">
@@ -50,12 +69,8 @@ export default function SingleChat() {
                 x.senderId != userid ? "left-side" : "right-side"
               }`}
             >
-              <div className="message-content">
-                {x.message}
-              </div>
-              <div className="message-time">
-                18:07
-              </div>
+              <div className="message-content">{x.message}</div>
+              <div className="message-time">18:07</div>
             </div>
           );
         })}

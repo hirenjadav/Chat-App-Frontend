@@ -3,6 +3,8 @@ enum API_ENDPOINT_CONSTANTS {
   LOGOUT = '/auth/logout',
   SIGN_UP = '/auth/signup',
 
+  USERS = '/user',
+
   CHATS = "/conv",
 
   FRIENDS = "/friend",

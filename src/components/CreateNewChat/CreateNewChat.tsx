@@ -1,31 +1,48 @@
 import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { AutoComplete } from "primereact/autocomplete";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import FontIconWrapper from "../FontIconWrapper";
-import "./CreateNewChat.scss"
+import "./CreateNewChat.scss";
 
 export default function CreateNewChat() {
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
-  const [friendList, setFriendList] = useState([]);
   const [searchField, setSearchField] = useState("");
-  const [userList, setuserList] = useState("");
+  const [userList, setuserList] = useState<any[]>([]);
 
-  const navigate = useNavigate();
+  const phoneNumberRegExp: RegExp = /\b\d{10}\b/;
+  const emailRegExp: RegExp =
+    /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
-  const searchFriend = () => {
+  const searchFriend = (searchValue: string) => {
     setShowLoading(true);
+    const filters = {
+      search: searchValue,
+    };
+
     httpServices
-      .get(API_ENDPOINT_CONSTANTS.FRIENDS)
+      .get(API_ENDPOINT_CONSTANTS.FRIENDS, filters)
       .then((response) => {
-        console.log(response);
         if (response["status"] == "success") {
-          localStorage.setItem("userData", JSON.stringify(response["data"]));
-          localStorage.setItem("token", response["data"]["accessToken"]);
-          navigate("/chat");
+          const list: any[] = response["data"];
+          if (!list.length) {
+            if (emailRegExp.test(searchValue)) {
+              list.push({
+                fullName: `Start chat with ${searchValue}`,
+                email: searchValue,
+              });
+            }
+
+            if (phoneNumberRegExp.test(searchValue)) {
+              list.push({
+                fullName: `Start chat with ${searchValue}`,
+                phoneNumber: searchValue,
+              });
+            }
+          }
+          setuserList(list);
         } else {
           toast.current?.show({
             severity: "error",
@@ -39,6 +56,10 @@ export default function CreateNewChat() {
       .finally(() => setShowLoading(false));
   };
 
+  const handleSuggestionSelect = (e) => {
+    setSearchField("");
+  };
+
   return (
     <div className="new-chat-input-wrapper">
       <FontIconWrapper icon="fa-solid fa-magnifying-glass" />
@@ -48,9 +69,11 @@ export default function CreateNewChat() {
         className="w-100"
         loadingIcon="''"
         inputClassName="w-100 rounded-5 input-field"
-        suggestions={friendList}
-        completeMethod={searchFriend}
+        field="fullName"
+        suggestions={userList}
+        completeMethod={(e) => searchFriend(e.query)}
         onChange={(e) => setSearchField(e.value)}
+        onSelect={handleSuggestionSelect}
       />
     </div>
   );

@@ -7,16 +7,23 @@ import httpServices from "../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../constants/apiEndpointConstants";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  userDetailsActions,
+  userDetailsSelector,
+} from "../state/userDetailsSlice";
+import authService from "../services/authService";
 
 export default function SignUp() {
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
+  const userId: string = useSelector(userDetailsSelector.userId);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const userData = localStorage.getItem("userData");
-    if (userData) navigate("/chat");
-  });
+    if (userId) navigate("/chat");
+  }, [userId, navigate]);
 
   const [signUpCredential, setsignUpCredential] = useState({
     firstName: "",
@@ -90,8 +97,8 @@ export default function SignUp() {
       .then((response) => {
         console.log(response);
         if (response["status"] == "success") {
-          localStorage.setItem("userData", JSON.stringify(response["data"]));
-          localStorage.setItem("token", response["data"]["accessToken"]);
+          dispatch(userDetailsActions.setUserDetails(response["data"]));
+          authService.setAccessToken(response["data"]["accessToken"]);
           navigate("/chat");
         } else {
           toast.current?.show({

@@ -21,8 +21,6 @@ function App() {
           <Route path="forgot-password" Component={ForgotPassword} />
         </Route>
         <Route path="/chat" Component={ChatHomePage}></Route>
-        <Route path="/chat/new" Component={ChatHomePage}></Route>
-        <Route path="/chat/:id" Component={ChatHomePage}></Route>
       </Routes>
     </Router>
   );

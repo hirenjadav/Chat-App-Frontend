@@ -47,7 +47,7 @@ function post(
       headers['Authorization'] = `Bearer ${accessToken}`;
     }
     if(localStorage.getItem('userData')) {
-      const userData: any = localStorage.getItem('userData')!;
+      const userData: any = JSON.parse(localStorage.getItem('userData')!);
       params = {
         ...params,
         userId: userData.id

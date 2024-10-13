@@ -6,30 +6,45 @@ import FontIconWrapper from "../FontIconWrapper";
 import { Avatar } from "primereact/avatar";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Toast } from "primereact/toast";
-import { singleChatDummyData } from "../../constants/singleChatDummyData";
+import { useSelector } from "react-redux";
+import { chatDetailsSelector } from "../../state/chatDetailsSlice";
+import { ChatDetails } from "../../models/chatDetails.model";
+import { userDetailsSelector } from "../../state/userDetailsSlice";
+import { UserDetails } from "../../models/userDetails.model";
+import { MESSAGE_TYPES } from "../../constants/messageTypes.constant";
+import {
+  MessageDetails,
+  messageDetailsMapper,
+} from "../../models/messageDetails.model";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
-  const [messageList, setMessageList] = useState(singleChatDummyData);
+  const [messageList, setMessageList] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
-  const userData = JSON.parse(localStorage.getItem("userData")!);
-  const userid = "2a57e7b6-9c8c-4b77-9f5c-21c52a8b69c5";
-  const { id: conversationId } = useParams();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const newChatPhoneNumber = location.state?.phoneNumber;
+  const userDetails: UserDetails | null = useSelector(
+    userDetailsSelector.userDetails
+  );
+  const chatDetails: ChatDetails | null = useSelector(
+    chatDetailsSelector.chatDetails
+  );
 
   useEffect(() => {
-    if (conversationId) {
+    if (chatDetails?.id) {
+      const params = {
+        conversationId: chatDetails.id,
+      };
+
       setShowLoading(true);
       httpServices
-        .get(API_ENDPOINT_CONSTANTS.CHATS)
+        .get(API_ENDPOINT_CONSTANTS.MESSAGE_LIST, params)
         .then((response) => {
           if (response["status"] == "success") {
-            setMessageList(response["data"]);
+            const list: MessageDetails[] = response["data"].map((x) =>
+              messageDetailsMapper(x)
+            );
+            setMessageList(list);
           } else {
             toast.current?.show({
               severity: "error",
@@ -42,56 +57,63 @@ export default function SingleChat() {
         })
         .finally(() => setShowLoading(false));
     }
-  }, [conversationId]);
+  }, [chatDetails?.id]);
 
-  if (newChatPhoneNumber && window.location.pathname.endsWith("/new")) {
-    return (
-      <div className="single-chat-container">
-        <SingleChatHeader conversationName={newChatPhoneNumber} />
+  const handleMessageSend = () => {
+    const params = {
+      conversationId: chatDetails.id,
+      messageType: MESSAGE_TYPES.TEXT,
+      message: messageTextField,
+    };
 
-        <div className="flex-grow-1 d-flex justify-content-center align-items-center px-3">
-          <div>
-            <Button>Send Chat Request</Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (conversationId) {
-    return (
-      <div className="single-chat-container">
-        <SingleChatHeader conversationName={conversationId} />
-
-        <div className="conversation-chats">
-          {messageList.map((x: any) => {
-            return (
-              <div
-                key={x.id}
-                className={`single-message-item ${
-                  x.senderId != userid ? "left-side" : "right-side"
-                }`}
-              >
-                <div className="message-content">{x.message}</div>
-                <div className="message-time">18:07</div>
-              </div>
-            );
-          })}
-        </div>
-
-        <SingleChatInputField
-          messageTextField={messageTextField}
-          setMessageTextField={setMessageTextField}
-        />
-      </div>
-    );
-  }
+    setShowLoading(true);
+    httpServices
+      .post(API_ENDPOINT_CONSTANTS.CREATE_MESSAGE, params)
+      .then((response) => {
+        if (response["status"] == "success") {
+          setMessageTextField("");
+          const message: MessageDetails = messageDetailsMapper(response.data);
+          const list: MessageDetails[] = [...messageList];
+          list.push(message);
+          setMessageList(list);
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  };
 
   return (
     <div className="single-chat-container">
-      <div className="d-flex h-100 justify-content-center align-items-center">
-        Start New Chat
+      <SingleChatHeader conversationName={chatDetails?.name} />
+
+      <div className="conversation-chats">
+        {messageList.map((x: any) => {
+          return (
+            <div
+              key={x.id}
+              className={`single-message-item ${
+                x.senderId != userDetails?.id ? "left-side" : "right-side"
+              }`}
+            >
+              <div className="message-content">{x.message}</div>
+              <div className="message-time">18:07</div>
+            </div>
+          );
+        })}
       </div>
+
+      <SingleChatInputField
+        handleMessageSend={handleMessageSend}
+        messageTextField={messageTextField}
+        setMessageTextField={setMessageTextField}
+      />
     </div>
   );
 }
@@ -120,9 +142,11 @@ const SingleChatHeader = ({ conversationName }: any) => {
 const SingleChatInputField = ({
   messageTextField,
   setMessageTextField,
+  handleMessageSend,
 }: {
   messageTextField: string;
   setMessageTextField: any;
+  handleMessageSend: any;
 }) => {
   return (
     <div>
@@ -139,7 +163,7 @@ const SingleChatInputField = ({
         <Button className="button-icon emoji" text>
           <FontIconWrapper icon="fa-solid fa-paperclip" />
         </Button>
-        <Button className="button-icon send">
+        <Button className="button-icon send" onClick={handleMessageSend}>
           <FontIconWrapper icon="fa-solid fa-arrow-right" />
         </Button>
       </div>

@@ -5,7 +5,11 @@ enum API_ENDPOINT_CONSTANTS {
 
   USERS = '/user',
 
-  CHATS = "/conv",
+  CHAT_LIST = "/conv/list",
+  CRAETE_CHAT = "/conv/create",
+
+  MESSAGE_LIST = "/message",
+  CREATE_MESSAGE = "/message/create",
 
   FRIENDS = "/friend",
 }

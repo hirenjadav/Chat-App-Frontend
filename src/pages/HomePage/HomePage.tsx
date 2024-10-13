@@ -30,7 +30,7 @@ export default function HomePage() {
           <Outlet />
         </div>
 
-        {currentPage == "signin" || currentPage == "forgot-password" ? (
+        {currentPage == "login" || currentPage == "forgot-password" ? (
           <p className="mt-2 text-center">
             Didn't have an account?
             <Link className="ms-1 text-decoration-none" to={"signup"}>

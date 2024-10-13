@@ -1,29 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
 import "./ChatList.scss";
 import { Toast } from "primereact/toast";
-import { useNavigate } from "react-router-dom";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import CreateNewChat from "../CreateNewChat/CreateNewChat";
-import { chatListDummyList } from "../../constants/chatListDummyData";
+import { UserDetails } from "../../models/userDetails.model";
+import { useDispatch, useSelector } from "react-redux";
+import { userDetailsSelector } from "../../state/userDetailsSlice";
+import { ChatDetailsMapper } from "../../models/chatDetails.model";
+import { chatDetailsActions } from "../../state/chatDetailsSlice";
 
 export default function ChatList() {
   const [showLoading, setShowLoading] = useState(false);
-  const [chatList, setChatList] = useState(
-    formatChatListDate(chatListDummyList)
-  );
+  const [chatList, setChatList] = useState([]);
   const toast = useRef<Toast>(null);
-  const navigate = useNavigate();
-
-  const userData = JSON.parse(localStorage.getItem("userData")!);
+  const dispatch = useDispatch();
+  const userDetails: UserDetails | null = useSelector(
+    userDetailsSelector.userDetails
+  );
 
   useEffect(() => {
     setShowLoading(true);
     httpServices
-      .get(API_ENDPOINT_CONSTANTS.CHATS)
+      .get(API_ENDPOINT_CONSTANTS.CHAT_LIST)
       .then((response) => {
         if (response["status"] == "success") {
-          setChatList(response["data"]);
+          const list: any = response.data.map((x) => ChatDetailsMapper(x));
+          setChatList(list);
         } else {
           toast.current?.show({
             severity: "error",
@@ -35,7 +38,11 @@ export default function ChatList() {
         }
       })
       .finally(() => setShowLoading(false));
-  }, [userData.id]);
+  }, [userDetails?.id]);
+
+  const handleChatSelection = (x) => {
+    dispatch(chatDetailsActions.setChatDetails(x));
+  };
 
   return (
     <div className="bg-white overflow-hidden p-3 rounded-5">
@@ -48,7 +55,11 @@ export default function ChatList() {
               <>
                 {index != 0 && <hr className="my-2" />}
 
-                <button key={x.id} className="chat-list-single-item">
+                <button
+                  key={x.id}
+                  className="chat-list-single-item"
+                  onClick={() => handleChatSelection(x)}
+                >
                   <div className="single-item-picture">
                     <img src={x.image} />
                   </div>

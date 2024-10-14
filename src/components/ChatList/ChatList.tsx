@@ -5,16 +5,17 @@ import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import CreateNewChat from "../CreateNewChat/CreateNewChat";
 import { UserDetails } from "../../models/userDetails.model";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { userDetailsSelector } from "../../state/userDetailsSlice";
-import { ChatDetailsMapper } from "../../models/chatDetails.model";
-import { chatDetailsActions } from "../../state/chatDetailsSlice";
+import { ChatListItemMapper } from "../../models/chatListItem.model";
+import { Avatar } from "primereact/avatar";
+import { useNavigate } from "react-router-dom";
 
 export default function ChatList() {
   const [showLoading, setShowLoading] = useState(false);
   const [chatList, setChatList] = useState([]);
   const toast = useRef<Toast>(null);
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
   );
@@ -25,7 +26,7 @@ export default function ChatList() {
       .get(API_ENDPOINT_CONSTANTS.CHAT_LIST)
       .then((response) => {
         if (response["status"] == "success") {
-          const list: any = response.data.map((x) => ChatDetailsMapper(x));
+          const list: any = response.data.map((x) => ChatListItemMapper(x));
           setChatList(list);
         } else {
           toast.current?.show({
@@ -41,7 +42,7 @@ export default function ChatList() {
   }, [userDetails?.id]);
 
   const handleChatSelection = (x) => {
-    dispatch(chatDetailsActions.setChatDetails(x));
+    navigate("/chat/" + x.id);
   };
 
   return (
@@ -61,12 +62,21 @@ export default function ChatList() {
                   onClick={() => handleChatSelection(x)}
                 >
                   <div className="single-item-picture">
-                    <img src={x.image} />
+                    {x.profilePicture ? (
+                      <img src={x.profilePicture} />
+                    ) : (
+                      <Avatar
+                        label={"X"}
+                        size="large"
+                        shape="circle"
+                        style={{ backgroundColor: "#2196F3", color: "#ffffff" }}
+                      />
+                    )}
                   </div>
                   <div className="single-item-details">
                     <div className="single-item-details-name">{x.name}</div>
                     <div className="single-item-details-message">
-                      {x.latest_message}
+                      {x.latestMessage.message}
                     </div>
                   </div>
                   <div className="single-item-status">
@@ -89,35 +99,3 @@ export default function ChatList() {
     </div>
   );
 }
-
-const formatChatListDate = (list: any[]) => {
-  return list.map((x) => {
-    const today = new Date();
-    const date = new Date(x.latest_message_time);
-
-    const isToday = today.toDateString() === date.toDateString();
-
-    let formattedDate;
-
-    if (isToday) {
-      // Format for today's date (HH:MM)
-      formattedDate = date.toLocaleTimeString("en-US", {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-    } else {
-      // Format for other dates (MM/DD/YYYY)
-      formattedDate = date.toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      });
-    }
-
-    return {
-      ...x,
-      latest_message_time: formattedDate,
-    };
-  });
-};

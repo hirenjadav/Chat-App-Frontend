@@ -7,8 +7,11 @@ import { Avatar } from "primereact/avatar";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import { Toast } from "primereact/toast";
-import { useSelector } from "react-redux";
-import { chatDetailsSelector } from "../../state/chatDetailsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  chatDetailsActions,
+  chatDetailsSelector,
+} from "../../state/chatDetailsSlice";
 import { ChatDetails } from "../../models/chatDetails.model";
 import { userDetailsSelector } from "../../state/userDetailsSlice";
 import { UserDetails } from "../../models/userDetails.model";
@@ -17,12 +20,15 @@ import {
   MessageDetails,
   messageDetailsMapper,
 } from "../../models/messageDetails.model";
+import { useParams } from "react-router-dom";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
   const [messageList, setMessageList] = useState([]);
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
+  const { id: chatId } = useParams();
+  const dispatch = useDispatch();
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
   );
@@ -31,33 +37,71 @@ export default function SingleChat() {
   );
 
   useEffect(() => {
-    if (chatDetails?.id) {
-      const params = {
-        conversationId: chatDetails.id,
-      };
+    fetchChatDetails();
+  }, [chatId]);
 
-      setShowLoading(true);
-      httpServices
-        .get(API_ENDPOINT_CONSTANTS.MESSAGE_LIST, params)
-        .then((response) => {
-          if (response["status"] == "success") {
-            const list: MessageDetails[] = response["data"].map((x) =>
-              messageDetailsMapper(x)
-            );
-            setMessageList(list);
-          } else {
-            toast.current?.show({
-              severity: "error",
-              summary: "Error",
-              detail: response?.data?.errorDescription
-                ? response?.data?.errorDescription
-                : "Something Went Wrong",
-            });
-          }
-        })
-        .finally(() => setShowLoading(false));
-    }
+  useEffect(() => {
+    fetchMessageList();
   }, [chatDetails?.id]);
+
+  const fetchMessageList = () => {
+    if (!chatDetails?.id) return;
+
+    const params = {
+      conversationId: chatDetails.id,
+    };
+
+    setShowLoading(true);
+    httpServices
+      .get(API_ENDPOINT_CONSTANTS.MESSAGE_LIST, params)
+      .then((response) => {
+        if (response["status"] == "success") {
+          const list: MessageDetails[] = response["data"].map((x) =>
+            messageDetailsMapper(x)
+          );
+          setMessageList(list);
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  };
+
+  const fetchChatDetails = () => {
+    if (!chatId) return;
+
+    setShowLoading(true);
+    const params = {
+      conversationId: chatId,
+    };
+
+    httpServices
+      .get(API_ENDPOINT_CONSTANTS.CHAT_LIST, params)
+      .then((response) => {
+        if (response["status"] == "success") {
+          if (response.data && response.data.length) {
+            dispatch(chatDetailsActions.setChatDetails(response.data[0]));
+          } else {
+            dispatch(chatDetailsActions.setChatDetails(null));
+          }
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  };
 
   const handleMessageSend = () => {
     const params = {
@@ -88,6 +132,14 @@ export default function SingleChat() {
       })
       .finally(() => setShowLoading(false));
   };
+
+  if (!chatDetails?.id) {
+    return (
+      <div className="single-chat-container">
+        <div className="align-self-center">START NEW CHAT</div>
+      </div>
+    );
+  }
 
   return (
     <div className="single-chat-container">

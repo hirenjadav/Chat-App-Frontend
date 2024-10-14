@@ -25,15 +25,15 @@
             & img {
                 height: 100%;
                 width: 100%;
-            } 
+            }
 
+            & .p-avatar {
+                height: 50px;
+                width: 100%;
+            }
         }
 
         &-details {
-            display: flex;
-            flex-direction: column;
-            row-gap: 5px;
-
             &-name {
                 font-size: 18px;
                 font-weight: 600;

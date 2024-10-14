@@ -3,21 +3,36 @@
     background-color: white;
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
     align-items: center;
-    row-gap: 15px;
     padding: 20px 10px;
-  
-    & .sidebar-button {
-      padding: 15px 13px;
-      font-size: 25px;
-      border-radius: 50%;
-  
-      &.active {
-        box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #9dc1fb, 0 1px 2px 0 rgb(0, 0, 0);
-      }
-  
-      &:not(.active):focus {
-        box-shadow: none;
-      }
+
+    &-buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        row-gap: 15px;
+
+        & .sidebar-button {
+            padding: 15px 13px;
+            font-size: 25px;
+            border-radius: 50%;
+
+            &.active {
+                box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #9dc1fb,
+                    0 1px 2px 0 rgb(0, 0, 0);
+            }
+
+            &:not(.active):focus {
+                box-shadow: none;
+            }
+        }
+    }
+
+    &-actions {
+        & .sidebar-action-btn {
+            padding: 0;
+            font-size: 25px;
+        }
     }
 }

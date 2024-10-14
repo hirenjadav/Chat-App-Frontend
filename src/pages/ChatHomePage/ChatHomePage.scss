@@ -1,23 +1,23 @@
-$sideBarWidth: 80px;
+$sideBarWidth: 82px;
 
 .chat-sidebar-container {
-  flex: 0 0 $sideBarWidth;
+    flex: 0 0 $sideBarWidth;
 }
 
 .chat-home-container {
-  flex: 0 0 calc(100% - $sideBarWidth);
-  display: flex;
-  column-gap: 20px;
-  padding: 20px;
-
-  & .chat-list {
-
-  }
-
-  & .single-chat {
     flex-grow: 1;
-    border-radius: 20px;
+    // flex: 0 0 calc(100% - $sideBarWidth);
+    display: flex;
+    column-gap: 20px;
     padding: 20px;
-    background-color: #e6e6e6;
-  }
+
+    & .chat-list {
+    }
+
+    & .single-chat {
+        flex-grow: 1;
+        border-radius: 20px;
+        padding: 20px;
+        background-color: #e6e6e6;
+    }
 }

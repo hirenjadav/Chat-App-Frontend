@@ -5,6 +5,7 @@ export interface UserDetails {
   phoneNumber: number;
   phoneCountryCode: number;
   email: string;
+  profilePicture: string;
 }
 
 export function userDetailsMapper(user: any): UserDetails {
@@ -15,5 +16,6 @@ export function userDetailsMapper(user: any): UserDetails {
     phoneNumber: user.phoneNumber || 0,
     phoneCountryCode: user.phoneCountryCode || 0,
     email: user.email || '',
+    profilePicture: user.profilePicture || '',
   };
 }

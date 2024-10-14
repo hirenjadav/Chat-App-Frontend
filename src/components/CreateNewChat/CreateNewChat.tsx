@@ -6,9 +6,11 @@ import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import FontIconWrapper from "../FontIconWrapper";
 import "./CreateNewChat.scss";
 import { CONVESATION_TYPES } from "../../constants/conversationTypes.constant";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { chatDetailsActions } from "../../state/chatDetailsSlice";
 import { ChatDetailsMapper } from "../../models/chatDetails.model";
+import { UserDetails } from "../../models/userDetails.model";
+import { userDetailsSelector } from "../../state/userDetailsSlice";
 
 export default function CreateNewChat() {
   const [showLoading, setShowLoading] = useState(false);
@@ -16,6 +18,9 @@ export default function CreateNewChat() {
   const [searchField, setSearchField] = useState("");
   const [userList, setuserList] = useState<any[]>([]);
   const dispatch = useDispatch();
+  const userDetails: UserDetails | null = useSelector(
+    userDetailsSelector.userDetails
+  );
 
   const phoneNumberRegExp: RegExp = /\b\d{10}\b/;
   const emailRegExp: RegExp =
@@ -31,7 +36,8 @@ export default function CreateNewChat() {
       .get(API_ENDPOINT_CONSTANTS.USERS, filters)
       .then((response) => {
         if (response["status"] == "success") {
-          const list: any[] = response["data"];
+          let list: any[] = response["data"];
+          list = list.filter((x) => x.id != userDetails.id);
           if (!list.length) {
             if (emailRegExp.test(searchValue)) {
               list.push({

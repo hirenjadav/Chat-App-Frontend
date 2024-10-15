@@ -21,6 +21,8 @@ import {
   messageDetailsMapper,
 } from "../../models/messageDetails.model";
 import { useParams } from "react-router-dom";
+import { socket } from "../../configs/socket.config";
+import { MESSAGE_EVENTS } from "../../constants/websocketEvents.constant";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
@@ -29,6 +31,7 @@ export default function SingleChat() {
   const toast = useRef<Toast>(null);
   const { id: chatId } = useParams();
   const dispatch = useDispatch();
+  const divRef = useRef(null);
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
   );
@@ -42,6 +45,12 @@ export default function SingleChat() {
 
   useEffect(() => {
     fetchMessageList();
+
+    if (chatDetails?.id) {
+      connectWebSocket();
+    } else {
+      if (socket.connected) disconnectWebSocket();
+    }
   }, [chatDetails?.id]);
 
   const fetchMessageList = () => {
@@ -60,6 +69,7 @@ export default function SingleChat() {
             messageDetailsMapper(x)
           );
           setMessageList(list);
+          scrollToBottom();
         } else {
           toast.current?.show({
             severity: "error",
@@ -103,34 +113,46 @@ export default function SingleChat() {
       .finally(() => setShowLoading(false));
   };
 
+  const connectWebSocket = () => {
+    socket.connect();
+    socket.emit(MESSAGE_EVENTS.CREATE_CONVERSATION, chatDetails.id);
+
+    socket.on(MESSAGE_EVENTS.RECIEVE_MESSAGE, (newMessage) =>
+      addNewMessage(newMessage)
+    );
+  };
+
+  const disconnectWebSocket = () => {
+    socket.disconnect();
+  };
+
   const handleMessageSend = () => {
     const params = {
+      senderId: userDetails.id,
       conversationId: chatDetails.id,
       messageType: MESSAGE_TYPES.TEXT,
       message: messageTextField,
     };
 
-    setShowLoading(true);
-    httpServices
-      .post(API_ENDPOINT_CONSTANTS.CREATE_MESSAGE, params)
-      .then((response) => {
-        if (response["status"] == "success") {
-          setMessageTextField("");
-          const message: MessageDetails = messageDetailsMapper(response.data);
-          const list: MessageDetails[] = [...messageList];
-          list.push(message);
-          setMessageList(list);
-        } else {
-          toast.current?.show({
-            severity: "error",
-            summary: "Error",
-            detail: response?.data?.errorDescription
-              ? response?.data?.errorDescription
-              : "Something Went Wrong",
-          });
-        }
-      })
-      .finally(() => setShowLoading(false));
+    setMessageTextField("");
+    socket.emit(MESSAGE_EVENTS.SEND_MESSAGE, params, (response) => {
+      if (response.success) {
+        addNewMessage(response.data);
+      } else {
+        console.error("Failed to send message:", response.error);
+      }
+    });
+  };
+
+  const addNewMessage = (newMessage) => {
+    const mappedMessage = messageDetailsMapper(newMessage);
+    const list = [...messageList, mappedMessage];
+    setMessageList(list);
+    scrollToBottom();
+  };
+
+  const scrollToBottom = () => {
+    divRef.current.scrollTop = divRef.current.scrollHeight;
   };
 
   if (!chatDetails?.id) {
@@ -145,7 +167,7 @@ export default function SingleChat() {
     <div className="single-chat-container">
       <SingleChatHeader conversationName={chatDetails?.name} />
 
-      <div className="conversation-chats">
+      <div className="conversation-chats" ref={divRef}>
         {messageList.map((x: any) => {
           return (
             <div

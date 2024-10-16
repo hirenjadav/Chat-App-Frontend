@@ -9,6 +9,7 @@ import {
   userDetailsSelector,
 } from "../../state/userDetailsSlice";
 import { useEffect } from "react";
+import CreateNewGroup from "../../components/CreateNewGroup/CreateNewGroup";
 
 export default function ChatHomePage() {
   const dispatch = useDispatch();
@@ -29,8 +30,11 @@ export default function ChatHomePage() {
       </div>
       <div className="chat-home-container">
         <div className="chat-list">
-          <div>
-            <h2 className="mb-3">CHAT APP</h2>
+          <div className="d-flex justify-content-between align-items-center mb-3">
+            <h3 className="m-0">CHAT APP</h3>
+            <div>
+              <CreateNewGroup />
+            </div>
           </div>
 
           <ChatList />

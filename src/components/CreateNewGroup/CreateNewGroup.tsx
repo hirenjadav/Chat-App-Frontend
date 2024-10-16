@@ -1,0 +1,195 @@
+import React, { useEffect, useRef, useState } from "react";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import FontIconWrapper from "../FontIconWrapper";
+import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
+import { userDetailsSelector } from "../../state/userDetailsSlice";
+import { useDispatch, useSelector } from "react-redux";
+import { AutoComplete } from "primereact/autocomplete";
+import httpServices from "../../services/httpServices";
+import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
+import "./CreateNewGroup.scss";
+import { UserDetails } from "../../models/userDetails.model";
+import { CONVESATION_TYPES } from "../../constants/conversationTypes.constant";
+import { ChatDetailsMapper } from "../../models/chatDetails.model";
+import { chatDetailsActions } from "../../state/chatDetailsSlice";
+
+export default function CreateNewGroup() {
+  const [visible, setVisible] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const dispatch = useDispatch();
+  const toast = useRef<Toast>(null);
+  const [userSuggestionList, setUserSuggestionList] = useState<any[]>([]);
+  const userDetails: UserDetails | null = useSelector(
+    userDetailsSelector.userDetails
+  );
+
+  const [createGroup, setCreateGroup] = useState({
+    name: "",
+    members: [],
+  });
+
+  useEffect(() => {
+    if (!visible)
+      setCreateGroup({
+        name: "",
+        members: [],
+      });
+  }, [visible]);
+
+  const onInputChange = (event: any, field: "name" | "members") => {
+    let value = null;
+    if (field == "name") value = event.target.value;
+    if (field == "members") value = event.value;
+    setCreateGroup({
+      ...createGroup,
+      [field]: value,
+    });
+  };
+
+  const searchUsers = (searchValue: string) => {
+    setShowLoading(true);
+    const filters = {
+      search: searchValue,
+    };
+
+    httpServices
+      .get(API_ENDPOINT_CONSTANTS.USERS, filters)
+      .then((response) => {
+        if (response["status"] == "success") {
+          let list: any[] = response["data"];
+          list = list.filter((x) => x.id != userDetails.id);
+          list = list.filter(
+            (user) => !userSuggestionList.some((u) => u.id == user.id)
+          );
+          setUserSuggestionList(list);
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  };
+
+  const handleCreateNewGroup = () => {
+    if (!createGroup.name) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Group Name Missing",
+      });
+      return;
+    }
+
+    if (createGroup.members.length < 2) {
+      toast.current?.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Select at least two members",
+      });
+      return;
+    }
+
+    const newConversation = {
+      conversationType: CONVESATION_TYPES.GROUP,
+      participantIds: createGroup.members.map((x) => x.id),
+    };
+
+    httpServices
+      .post(API_ENDPOINT_CONSTANTS.CRAETE_CHAT, newConversation)
+      .then((response) => {
+        if (response["status"] == "success") {
+          const mappedDetails = ChatDetailsMapper(response.data);
+          dispatch(chatDetailsActions.setChatDetails(mappedDetails));
+        } else {
+          toast.current?.show({
+            severity: "error",
+            summary: "Error",
+            detail: response?.data?.errorDescription
+              ? response?.data?.errorDescription
+              : "Something Went Wrong",
+          });
+        }
+      })
+      .finally(() => setShowLoading(false));
+  };
+
+  const footerContent = () => {
+    return (
+      <div className="d-flex justify-content-end column-gap-3 align-items-center">
+        <Button
+          onClick={() => setVisible(false)}
+          label="Cancel"
+          outlined
+        ></Button>
+
+        <Button onClick={handleCreateNewGroup} label="Create" />
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Button
+        onClick={() => setVisible(true)}
+        rounded
+        text
+        raised
+        severity="info"
+      >
+        <FontIconWrapper icon="fa-solid fa-plus" />
+      </Button>
+
+      <Dialog
+        header="Create Group"
+        visible={visible}
+        closable={false}
+        footer={footerContent}
+        style={{
+          minWidth: "400px",
+          width: "50vw",
+          maxWidth: "700px",
+        }}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}
+      >
+        <div className="d-flex flex-column row-gap-4">
+          <div className="d-flex flex-column row-gap-2">
+            <label className="ps-1">Group Name</label>
+            <InputText
+              value={createGroup.name}
+              placeholder="Enter group name"
+              className="w-100"
+              onInput={(e) => onInputChange(e, "name")}
+            />
+          </div>
+
+          <div className="d-flex flex-column row-gap-2">
+            <label>Group Members</label>
+            <AutoComplete
+              inputId="membersInputId"
+              placeholder="Search users"
+              value={createGroup.members}
+              multiple
+              className="user-selection-field"
+              loadingIcon="''"
+              field="fullName"
+              suggestions={userSuggestionList}
+              completeMethod={(e) => searchUsers(e.query)}
+              onChange={(e) => onInputChange(e, "members")}
+            />
+          </div>
+        </div>
+      </Dialog>
+      <Toast ref={toast} />
+    </>
+  );
+}

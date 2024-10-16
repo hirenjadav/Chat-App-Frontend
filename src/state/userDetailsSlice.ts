@@ -12,6 +12,10 @@ const userDetailsSlice = createSlice({
       return JSON.parse(localStorage.getItem("userData"));
     },
     setUserDetails: (state, action: PayloadAction<any>) => {
+      if (!action.payload) {
+        localStorage.removeItem("userData");
+        return null;
+      }
       const mappedDetails = userDetailsMapper(action.payload);
       localStorage.setItem("userData", JSON.stringify(mappedDetails));
       return mappedDetails;

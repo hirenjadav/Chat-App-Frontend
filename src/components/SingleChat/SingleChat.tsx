@@ -40,16 +40,18 @@ export default function SingleChat() {
   );
 
   useEffect(() => {
-    fetchChatDetails();
+    if (chatId) {
+      fetchChatDetails();
+    } else {
+      dispatch(chatDetailsActions.setChatDetails(null));
+    }
   }, [chatId]);
 
   useEffect(() => {
     fetchMessageList();
 
-    if (chatDetails?.id) {
-      connectWebSocket();
-    } else {
-      if (socket.connected) disconnectWebSocket();
+    if (!chatDetails?.id && socket.connected) {
+      disconnectWebSocket();
     }
   }, [chatDetails?.id]);
 
@@ -70,6 +72,7 @@ export default function SingleChat() {
           );
           setMessageList(list);
           scrollToBottom();
+          connectWebSocket();
         } else {
           toast.current?.show({
             severity: "error",
@@ -146,8 +149,7 @@ export default function SingleChat() {
 
   const addNewMessage = (newMessage) => {
     const mappedMessage = messageDetailsMapper(newMessage);
-    const list = [...messageList, mappedMessage];
-    setMessageList(list);
+    setMessageList((prevMessages) => [...prevMessages, mappedMessage]);
     scrollToBottom();
   };
 

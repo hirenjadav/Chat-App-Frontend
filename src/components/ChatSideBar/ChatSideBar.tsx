@@ -4,13 +4,17 @@ import FontIconWrapper from "../FontIconWrapper";
 import "./ChatSideBar.scss";
 import authService from "../../services/authService";
 import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { userDetailsActions } from "../../state/userDetailsSlice";
 
 export default function ChatSideBar() {
   const [currentTab, setCurrentTab] = useState("chats");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleLogout = () => {
     authService.doLogout();
+    dispatch(userDetailsActions.setUserDetails(null));
     navigate("/auth/login");
   };
 

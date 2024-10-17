@@ -20,9 +20,12 @@ import {
   MessageDetails,
   messageDetailsMapper,
 } from "../../models/messageDetails.model";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { socket } from "../../configs/socket.config";
 import { MESSAGE_EVENTS } from "../../constants/websocketEvents.constant";
+import { Skeleton } from "primereact/skeleton";
+import EmojiPicker from "emoji-picker-react";
+import { OverlayPanel } from "primereact/overlaypanel";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
@@ -31,6 +34,7 @@ export default function SingleChat() {
   const toast = useRef<Toast>(null);
   const { id: chatId } = useParams();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const divRef = useRef(null);
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
@@ -67,7 +71,7 @@ export default function SingleChat() {
       .get(API_ENDPOINT_CONSTANTS.MESSAGE_LIST, params)
       .then((response) => {
         if (response["status"] == "success") {
-          const list: MessageDetails[] = response["data"].map((x) =>
+          const list: MessageDetails[] = response["data"].map((x: any) =>
             messageDetailsMapper(x)
           );
           setMessageList(list);
@@ -101,6 +105,7 @@ export default function SingleChat() {
           if (response.data && response.data.length) {
             dispatch(chatDetailsActions.setChatDetails(response.data[0]));
           } else {
+            navigate("/chat");
             dispatch(chatDetailsActions.setChatDetails(null));
           }
         } else {
@@ -130,6 +135,8 @@ export default function SingleChat() {
   };
 
   const handleMessageSend = () => {
+    if (!messageTextField.trim()) return;
+
     const params = {
       senderId: userDetails.id,
       conversationId: chatDetails.id,
@@ -138,7 +145,7 @@ export default function SingleChat() {
     };
 
     setMessageTextField("");
-    socket.emit(MESSAGE_EVENTS.SEND_MESSAGE, params, (response) => {
+    socket.emit(MESSAGE_EVENTS.SEND_MESSAGE, params, (response: any) => {
       if (response.success) {
         addNewMessage(response.data);
       } else {
@@ -147,7 +154,7 @@ export default function SingleChat() {
     });
   };
 
-  const addNewMessage = (newMessage) => {
+  const addNewMessage = (newMessage: any) => {
     const mappedMessage = messageDetailsMapper(newMessage);
     setMessageList((prevMessages) => [...prevMessages, mappedMessage]);
     scrollToBottom();
@@ -169,21 +176,49 @@ export default function SingleChat() {
     <div className="single-chat-container">
       <SingleChatHeader conversationName={chatDetails?.name} />
 
-      <div className="conversation-chats" ref={divRef}>
-        {messageList.map((x: any) => {
-          return (
-            <div
-              key={x.id}
-              className={`single-message-item ${
-                x.senderId != userDetails?.id ? "left-side" : "right-side"
-              }`}
-            >
-              <div className="message-content">{x.message}</div>
-              <div className="message-time">18:07</div>
-            </div>
-          );
-        })}
-      </div>
+      {showLoading ? (
+        <div className="conversation-chats" ref={divRef}>
+          {[
+            true,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+          ].map((x: any) => {
+            return (
+              <Skeleton
+                className={`mb-3 ${x ? "ms-auto" : ""}`}
+                height="1.5rem"
+                width="65%"
+                borderRadius="2rem"
+                style={{ backgroundColor: "lightgray" }}
+              ></Skeleton>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="conversation-chats" ref={divRef}>
+          {messageList.map((x: any) => {
+            return (
+              <div
+                key={x.id}
+                className={`single-message-item ${
+                  x.senderId != userDetails?.id ? "left-side" : "right-side"
+                }`}
+              >
+                <div className="message-content">{x.message}</div>
+                <div className="message-time">18:07</div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       <SingleChatInputField
         handleMessageSend={handleMessageSend}
@@ -224,15 +259,27 @@ const SingleChatInputField = ({
   setMessageTextField: any;
   handleMessageSend: any;
 }) => {
+  const emojiOverlay = useRef(null);
+
+  const handleKeyDown = (event: any) => {
+    if (!event.shiftKey && !event.ctrlKey && event.key === "Enter")
+      handleMessageSend();
+  };
+
   return (
     <div>
       <div className="single-message-input-wrapper">
-        <Button className="button-icon attachement" text>
+        <Button
+          onClick={(e) => emojiOverlay.current.toggle(e)}
+          className="button-icon attachement"
+          text
+        >
           <FontIconWrapper icon="fa-solid fa-face-smile" />
         </Button>
         <InputText
           className="input-field"
           placeholder="Type a message"
+          onKeyDown={handleKeyDown}
           value={messageTextField}
           onChange={(e) => setMessageTextField(e.target.value)}
         />
@@ -243,6 +290,10 @@ const SingleChatInputField = ({
           <FontIconWrapper icon="fa-solid fa-arrow-right" />
         </Button>
       </div>
+
+      <OverlayPanel pt={{ content: { className: "p-0" } }} ref={emojiOverlay}>
+        <EmojiPicker />
+      </OverlayPanel>
     </div>
   );
 };

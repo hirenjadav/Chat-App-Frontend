@@ -1,12 +1,5 @@
-import { CONVESATION_TYPES } from "../constants/conversationTypes.constant";
-
-export interface ChatCreatorDetails {
-  id: string;
-}
-
-export interface ChatMember {
-  id: string;
-}
+import { CONVERSATION_TYPES } from "../constants/conversationTypes.constant";
+import { ChatMember, chatMemberMapper } from "./chatMember.model";
 
 export interface ChatDetails {
   id: string;
@@ -17,7 +10,7 @@ export interface ChatDetails {
 }
 
 export function ChatDetailsMapper(chat: any): ChatDetails {
-  if (chat.type == CONVESATION_TYPES.PERSONAL) {
+  if (chat.type == CONVERSATION_TYPES.PERSONAL) {
     let userData = null;
     if (localStorage.getItem("userData")) {
       userData = JSON.parse(localStorage.getItem("userData")!);
@@ -36,6 +29,8 @@ export function ChatDetailsMapper(chat: any): ChatDetails {
     type: chat.type || "",
     name: chat.name || "",
     profilePicture: chat.profilePicture || "",
-    members: chat.participants || [],
+    members: chat.participants
+      ? chat.participants.map((x) => chatMemberMapper(x))
+      : [],
   };
 }

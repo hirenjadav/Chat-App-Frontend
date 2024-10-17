@@ -1,18 +1,20 @@
 export interface MessageDetails {
-  id: string,
-  messageType: string,
-  messageStatus: string,
-  message: string,
-  messageAttachment: any,
-  messageAttachmentType: string,
-  deletedAt: Date,
-  createdAt: Date,
-  updatedAt: Date,
-  conversationId: string,
-  senderId: string
+  id: string;
+  messageType: string;
+  messageStatus: string;
+  message: string;
+  messageAttachment: any;
+  messageAttachmentType: string;
+  deletedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  conversationId: string;
+  senderId: string;
 }
 
 export function messageDetailsMapper(data: any): MessageDetails {
+  if (!data) return null;
+
   return {
     id: data.id || null,
     messageType: data.messageType || null,
@@ -24,6 +26,6 @@ export function messageDetailsMapper(data: any): MessageDetails {
     createdAt: data.createdAt ? new Date(data.createdAt) : null,
     updatedAt: data.updatedAt ? new Date(data.updatedAt) : null,
     conversationId: data.conversationId || null,
-    senderId: data.senderId || null
+    senderId: data.senderId || null,
   };
 }

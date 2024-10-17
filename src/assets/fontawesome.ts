@@ -10,6 +10,7 @@ import {
   faFaceSmile,
   faKey,
   faMagnifyingGlass,
+  faMessage,
   faMinus,
   faPaperclip,
   faPencil,
@@ -42,5 +43,6 @@ library.add(
   faArrowRight,
   faCircleInfo,
   faUserGroup,
-  faArrowRightFromBracket
+  faArrowRightFromBracket,
+  faMessage
 );

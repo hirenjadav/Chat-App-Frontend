@@ -1,13 +1,6 @@
-import { CONVESATION_TYPES } from "../constants/conversationTypes.constant";
+import { CONVERSATION_TYPES } from "../constants/conversationTypes.constant";
+import { ChatMember, chatMemberMapper } from "./chatMember.model";
 import { MessageDetails, messageDetailsMapper } from "./messageDetails.model";
-
-export interface ChatCreatorDetails {
-  id: string;
-}
-
-export interface ChatMember {
-  id: string;
-}
 
 export interface ChatListItem {
   id: string;
@@ -19,7 +12,7 @@ export interface ChatListItem {
 }
 
 export function ChatListItemMapper(chat: any): ChatListItem {
-  if (chat.type == CONVESATION_TYPES.PERSONAL) {
+  if (chat.type == CONVERSATION_TYPES.PERSONAL) {
     let userData = null;
     if (localStorage.getItem("userData")) {
       userData = JSON.parse(localStorage.getItem("userData")!);
@@ -39,9 +32,9 @@ export function ChatListItemMapper(chat: any): ChatListItem {
     type: chat.type || "",
     name: chat.name || "",
     profilePicture: chat.profilePicture || "",
-    members: chat.participants || [],
-    latestMessage: chat.latestMessage
-      ? messageDetailsMapper(chat.latestMessage)
-      : null,
+    members: chat.participants
+      ? chat.participants.map((x) => chatMemberMapper(x))
+      : [],
+    latestMessage: messageDetailsMapper(chat.latestMessage),
   };
 }

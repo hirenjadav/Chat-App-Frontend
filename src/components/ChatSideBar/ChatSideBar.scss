@@ -14,7 +14,11 @@
         row-gap: 15px;
 
         & .sidebar-button {
-            padding: 15px 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+            width: 50px;
             font-size: 25px;
             border-radius: 50%;
 

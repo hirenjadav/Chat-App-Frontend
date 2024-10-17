@@ -7,11 +7,20 @@ import CreateNewChat from "../CreateNewChat/CreateNewChat";
 import { UserDetails } from "../../models/userDetails.model";
 import { useSelector } from "react-redux";
 import { userDetailsSelector } from "../../state/userDetailsSlice";
-import { ChatListItemMapper } from "../../models/chatListItem.model";
+import {
+  ChatListItem,
+  ChatListItemMapper,
+} from "../../models/chatListItem.model";
 import { Avatar } from "primereact/avatar";
 import { useNavigate } from "react-router-dom";
+import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
+import { Skeleton } from "primereact/skeleton";
 
-export default function ChatList() {
+interface ChatListProps {
+  selectedChatCategory: string;
+}
+
+export default function ChatList({ selectedChatCategory }: ChatListProps) {
   const [showLoading, setShowLoading] = useState(false);
   const [chatList, setChatList] = useState([]);
   const toast = useRef<Toast>(null);
@@ -21,12 +30,27 @@ export default function ChatList() {
   );
 
   useEffect(() => {
+    const params: any = {};
+    if (selectedChatCategory) {
+      switch (selectedChatCategory) {
+        case "groups":
+          params["conversationType"] = CONVERSATION_TYPES.GROUP;
+          break;
+
+        case "channels":
+          params["conversationType"] = CONVERSATION_TYPES.CHANNEL;
+          break;
+      }
+    }
+
     setShowLoading(true);
     httpServices
-      .get(API_ENDPOINT_CONSTANTS.CHAT_LIST)
+      .get(API_ENDPOINT_CONSTANTS.CHAT_LIST, params)
       .then((response) => {
         if (response["status"] == "success") {
-          const list: any = response.data.map((x) => ChatListItemMapper(x));
+          const list: ChatListItem[] = response.data.map((x: any) =>
+            ChatListItemMapper(x)
+          );
           setChatList(list);
         } else {
           toast.current?.show({
@@ -39,15 +63,42 @@ export default function ChatList() {
         }
       })
       .finally(() => setShowLoading(false));
-  }, [userDetails?.id]);
+  }, [userDetails?.id, selectedChatCategory]);
 
-  const handleChatSelection = (x) => {
+  const handleChatSelection = (x: ChatListItem) => {
     navigate("/chat/" + x.id);
   };
 
+  if (showLoading) {
+    return (
+      <div className="bg-white overflow-hidden p-3 rounded-5">
+        <CreateNewChat inputDisabled={true} />
+
+        <div className="chat-list-container">
+          {[1, 1, 1, 1, 1, 1].map((x) => {
+            return (
+              <div className="d-flex column-gap-3 align-items-center mb-3">
+                <Skeleton
+                  shape="circle"
+                  size="3rem"
+                  className="mr-2"
+                ></Skeleton>
+                <div>
+                  <Skeleton width="10rem" className="mb-2"></Skeleton>
+                  <Skeleton width="5rem" className="mb-2"></Skeleton>
+                  <Skeleton height=".5rem"></Skeleton>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white overflow-hidden p-3 rounded-5">
-      <CreateNewChat />
+      <CreateNewChat inputDisabled={false} />
 
       <div className="chat-list-container">
         {chatList.length > 0 &&
@@ -76,7 +127,7 @@ export default function ChatList() {
                   <div className="single-item-details">
                     <div className="single-item-details-name">{x.name}</div>
                     <div className="single-item-details-message">
-                      {x.latestMessage.message}
+                      {x.latestMessage?.message}
                     </div>
                   </div>
                   <div className="single-item-status">

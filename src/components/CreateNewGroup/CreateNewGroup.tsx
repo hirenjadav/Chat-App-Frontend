@@ -5,21 +5,21 @@ import FontIconWrapper from "../FontIconWrapper";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { userDetailsSelector } from "../../state/userDetailsSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { AutoComplete } from "primereact/autocomplete";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import "./CreateNewGroup.scss";
 import { UserDetails } from "../../models/userDetails.model";
-import { CONVESATION_TYPES } from "../../constants/conversationTypes.constant";
+import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { ChatDetailsMapper } from "../../models/chatDetails.model";
-import { chatDetailsActions } from "../../state/chatDetailsSlice";
+import { useNavigate } from "react-router-dom";
 
 export default function CreateNewGroup() {
   const [visible, setVisible] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
-  const dispatch = useDispatch();
   const toast = useRef<Toast>(null);
+  const navigate = useNavigate();
   const [userSuggestionList, setUserSuggestionList] = useState<any[]>([]);
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
@@ -97,7 +97,8 @@ export default function CreateNewGroup() {
     }
 
     const newConversation = {
-      conversationType: CONVESATION_TYPES.GROUP,
+      conversationType: CONVERSATION_TYPES.GROUP,
+      name: createGroup.name,
       participantIds: createGroup.members.map((x) => x.id),
     };
 
@@ -105,8 +106,9 @@ export default function CreateNewGroup() {
       .post(API_ENDPOINT_CONSTANTS.CRAETE_CHAT, newConversation)
       .then((response) => {
         if (response["status"] == "success") {
+          setVisible(false);
           const mappedDetails = ChatDetailsMapper(response.data);
-          dispatch(chatDetailsActions.setChatDetails(mappedDetails));
+          navigate("/chat/" + mappedDetails.id);
         } else {
           toast.current?.show({
             severity: "error",

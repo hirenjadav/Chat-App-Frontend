@@ -8,10 +8,13 @@ import {
   userDetailsActions,
   userDetailsSelector,
 } from "../../state/userDetailsSlice";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import CreateNewGroup from "../../components/CreateNewGroup/CreateNewGroup";
 
 export default function ChatHomePage() {
+  const [selectedChatCategory, setSelectedChatCategory] =
+    useState<string>("chats");
+
   const dispatch = useDispatch();
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
@@ -23,10 +26,16 @@ export default function ChatHomePage() {
     }
   }, [userDetails]);
 
+  const handleChatCategoryChange = (value: string) =>
+    setSelectedChatCategory(value);
+
   return (
     <div className="min-vh-100 h-100 d-flex">
       <div className="chat-sidebar-container">
-        <ChatSideBar />
+        <ChatSideBar
+          selectedChatCategory={selectedChatCategory}
+          handleChatCategoryChange={handleChatCategoryChange}
+        />
       </div>
       <div className="chat-home-container">
         <div className="chat-list">
@@ -37,7 +46,7 @@ export default function ChatHomePage() {
             </div>
           </div>
 
-          <ChatList />
+          <ChatList selectedChatCategory={selectedChatCategory} />
         </div>
         <div className="single-chat">
           <SingleChat />

@@ -5,19 +5,23 @@ import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import FontIconWrapper from "../FontIconWrapper";
 import "./CreateNewChat.scss";
-import { CONVESATION_TYPES } from "../../constants/conversationTypes.constant";
-import { useDispatch, useSelector } from "react-redux";
-import { chatDetailsActions } from "../../state/chatDetailsSlice";
+import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { ChatDetailsMapper } from "../../models/chatDetails.model";
 import { UserDetails } from "../../models/userDetails.model";
 import { userDetailsSelector } from "../../state/userDetailsSlice";
+import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
-export default function CreateNewChat() {
+interface CreateNewChatProps {
+  inputDisabled: boolean;
+}
+
+export default function CreateNewChat({ inputDisabled }: CreateNewChatProps) {
   const [showLoading, setShowLoading] = useState(false);
   const toast = useRef<Toast>(null);
   const [searchField, setSearchField] = useState("");
   const [userList, setuserList] = useState<any[]>([]);
-  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
   );
@@ -69,11 +73,11 @@ export default function CreateNewChat() {
       .finally(() => setShowLoading(false));
   };
 
-  const handleSuggestionSelect = (e) => {
+  const handleSuggestionSelect = (e: any) => {
     if (!e.value?.id) return;
 
     const newConversation = {
-      conversationType: CONVESATION_TYPES.PERSONAL,
+      conversationType: CONVERSATION_TYPES.PERSONAL,
       participantIds: [e.value.id],
     };
 
@@ -81,9 +85,9 @@ export default function CreateNewChat() {
       .post(API_ENDPOINT_CONSTANTS.CRAETE_CHAT, newConversation)
       .then((response) => {
         if (response["status"] == "success") {
-          const mappedDetails = ChatDetailsMapper(response.data);
-          dispatch(chatDetailsActions.setChatDetails(mappedDetails));
           setSearchField("");
+          const mappedDetails = ChatDetailsMapper(response.data);
+          navigate("/chat/" + mappedDetails.id);
         } else {
           toast.current?.show({
             severity: "error",
@@ -104,6 +108,7 @@ export default function CreateNewChat() {
         value={searchField}
         placeholder="Search Chat"
         className="w-100"
+        disabled={inputDisabled}
         loadingIcon="''"
         inputClassName="w-100 rounded-5 input-field"
         field="fullName"

@@ -6,7 +6,6 @@ $sideBarWidth: 82px;
 
 .chat-home-container {
     flex-grow: 1;
-    // flex: 0 0 calc(100% - $sideBarWidth);
     display: flex;
     column-gap: 20px;
     padding: 20px;

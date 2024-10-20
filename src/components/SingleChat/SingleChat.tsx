@@ -26,6 +26,7 @@ import { MESSAGE_EVENTS } from "../../constants/websocketEvents.constant";
 import { Skeleton } from "primereact/skeleton";
 import EmojiPicker from "emoji-picker-react";
 import { OverlayPanel } from "primereact/overlaypanel";
+import { MESSAGE_STATUS_TYPES } from "../../constants/messageStatusType";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
@@ -49,14 +50,14 @@ export default function SingleChat() {
     } else {
       dispatch(chatDetailsActions.setChatDetails(null));
     }
+
+    return () => disconnectWebSocket();
   }, [chatId]);
 
   useEffect(() => {
     fetchMessageList();
 
-    if (!chatDetails?.id && socket.connected) {
-      disconnectWebSocket();
-    }
+    if (!chatDetails?.id) disconnectWebSocket();
   }, [chatDetails?.id]);
 
   const fetchMessageList = () => {
@@ -122,8 +123,7 @@ export default function SingleChat() {
   };
 
   const connectWebSocket = () => {
-    socket.connect();
-    socket.emit(MESSAGE_EVENTS.CREATE_CONVERSATION, chatDetails.id);
+    socket.emit(MESSAGE_EVENTS.JOIN_CONVERSATION, chatDetails.id);
 
     socket.on(MESSAGE_EVENTS.RECIEVE_MESSAGE, (newMessage) =>
       addNewMessage(newMessage)
@@ -131,7 +131,8 @@ export default function SingleChat() {
   };
 
   const disconnectWebSocket = () => {
-    socket.disconnect();
+    if (socket.connected)
+      socket.emit(MESSAGE_EVENTS.LEAVE_CONVERSATION, chatId);
   };
 
   const handleMessageSend = () => {
@@ -141,7 +142,7 @@ export default function SingleChat() {
       senderId: userDetails.id,
       conversationId: chatDetails.id,
       messageType: MESSAGE_TYPES.TEXT,
-      message: messageTextField,
+      message: messageTextField.trim(),
     };
 
     setMessageTextField("");
@@ -157,11 +158,30 @@ export default function SingleChat() {
   const addNewMessage = (newMessage: any) => {
     const mappedMessage = messageDetailsMapper(newMessage);
     setMessageList((prevMessages) => [...prevMessages, mappedMessage]);
+    markMessagesSeen([mappedMessage]);
     scrollToBottom();
   };
 
   const scrollToBottom = () => {
     divRef.current.scrollTop = divRef.current.scrollHeight;
+  };
+
+  const markMessagesSeen = (messages: MessageDetails[]) => {
+    const params = {
+      senderId: userDetails.id,
+      status: MESSAGE_STATUS_TYPES.SEEN,
+      messageIds: messages.map((x) => x.id),
+    };
+
+    socket.emit(
+      MESSAGE_EVENTS.UPDATE_MESSAGE_STATUS,
+      params,
+      (response: any) => {
+        if (!response.success) {
+          console.error("Failed to mark message seen:", response.error);
+        }
+      }
+    );
   };
 
   if (!chatDetails?.id) {
@@ -190,9 +210,10 @@ export default function SingleChat() {
             true,
             false,
             false,
-          ].map((x: any) => {
+          ].map((x: any, i: number) => {
             return (
               <Skeleton
+                key={i}
                 className={`mb-3 ${x ? "ms-auto" : ""}`}
                 height="1.5rem"
                 width="65%"
@@ -204,7 +225,7 @@ export default function SingleChat() {
         </div>
       ) : (
         <div className="conversation-chats" ref={divRef}>
-          {messageList.map((x: any) => {
+          {messageList.map((x: MessageDetails) => {
             return (
               <div
                 key={x.id}
@@ -213,7 +234,7 @@ export default function SingleChat() {
                 }`}
               >
                 <div className="message-content">{x.message}</div>
-                <div className="message-time">18:07</div>
+                <div className="message-time">{x.messageTime}</div>
               </div>
             );
           })}

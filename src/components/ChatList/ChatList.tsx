@@ -15,6 +15,13 @@ import { Avatar } from "primereact/avatar";
 import { useNavigate } from "react-router-dom";
 import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { Skeleton } from "primereact/skeleton";
+import { socket } from "../../configs/socket.config";
+import { MESSAGE_EVENTS } from "../../constants/websocketEvents.constant";
+import { messageDetailsMapper } from "../../models/messageDetails.model";
+import { ChatDetails } from "../../models/chatDetails.model";
+import { chatDetailsSelector } from "../../state/chatDetailsSlice";
+import { cloneDeep, findIndex } from "lodash";
+import { Badge } from "primereact/badge";
 
 interface ChatListProps {
   selectedChatCategory: string;
@@ -22,11 +29,14 @@ interface ChatListProps {
 
 export default function ChatList({ selectedChatCategory }: ChatListProps) {
   const [showLoading, setShowLoading] = useState(false);
-  const [chatList, setChatList] = useState([]);
+  const [chatList, setChatList] = useState<ChatListItem[]>([]);
   const toast = useRef<Toast>(null);
   const navigate = useNavigate();
   const userDetails: UserDetails | null = useSelector(
     userDetailsSelector.userDetails
+  );
+  const chatDetails: ChatDetails | null = useSelector(
+    chatDetailsSelector.chatDetails
   );
 
   useEffect(() => {
@@ -65,9 +75,35 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
       .finally(() => setShowLoading(false));
   }, [userDetails?.id, selectedChatCategory]);
 
-  const handleChatSelection = (x: ChatListItem) => {
+  const handleChatSelection = (x: ChatListItem, index: number) => {
+    const list = cloneDeep(chatList);
+    list[index].unseenMessageCount = 0;
+    setChatList(list);
     navigate("/chat/" + x.id);
   };
+
+  useEffect(() => {
+    const handleNewMessage = (newMessage: any) => {
+      const mappedMessage = messageDetailsMapper(newMessage);
+      const list = cloneDeep(chatList);
+      const index = findIndex(
+        list,
+        (x) => x.id == mappedMessage.conversationId
+      );
+      if (index > -1) {
+        list[index].latestMessage = mappedMessage;
+        if (mappedMessage.conversationId != chatDetails?.id)
+          list[index].unseenMessageCount++;
+      }
+      setChatList(list);
+    };
+
+    socket.on(MESSAGE_EVENTS.CHAT_LIST_NEW_MESSAGE, handleNewMessage);
+
+    return () => {
+      socket.off(MESSAGE_EVENTS.CHAT_LIST_NEW_MESSAGE, handleNewMessage);
+    };
+  });
 
   if (showLoading) {
     return (
@@ -75,9 +111,12 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
         <CreateNewChat inputDisabled={true} />
 
         <div className="chat-list-container">
-          {[1, 1, 1, 1, 1, 1].map((x) => {
+          {[1, 1, 1, 1, 1, 1].map((x: number, i: number) => {
             return (
-              <div className="d-flex column-gap-3 align-items-center mb-3">
+              <div
+                key={i}
+                className="d-flex column-gap-3 align-items-center mb-3"
+              >
                 <Skeleton
                   shape="circle"
                   size="3rem"
@@ -102,19 +141,18 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
 
       <div className="chat-list-container">
         {chatList.length > 0 &&
-          chatList.map((x: any, index: number) => {
+          chatList.map((x: ChatListItem, index: number) => {
             return (
-              <>
-                {index != 0 && <hr className="my-2" />}
-
+              <React.Fragment key={x.id}>
+                {index !== 0 && <hr key={`hr-${index}`} className="my-2" />}
                 <button
-                  key={x.id}
+                  key={`button-${x.id}`}
                   className="chat-list-single-item"
-                  onClick={() => handleChatSelection(x)}
+                  onClick={() => handleChatSelection(x, index)}
                 >
-                  <div className="single-item-picture">
+                  <div key={`picture-${x.id}`} className="single-item-picture">
                     {x.profilePicture ? (
-                      <img src={x.profilePicture} />
+                      <img src={x.profilePicture} alt="Profile" />
                     ) : (
                       <Avatar
                         label={"X"}
@@ -124,22 +162,24 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                       />
                     )}
                   </div>
-                  <div className="single-item-details">
+                  <div key={`details-${x.id}`} className="single-item-details">
                     <div className="single-item-details-name">{x.name}</div>
                     <div className="single-item-details-message">
                       {x.latestMessage?.message}
                     </div>
                   </div>
-                  <div className="single-item-status">
+                  <div key={`status-${x.id}`} className="single-item-status">
                     <div className="single-item-status-time">
-                      {x.latest_message_time}
+                      {x.latestMessage?.messageTime}
                     </div>
-                    <div className="single-item-details-new-message">
-                      {x.unread_message}
+                    <div className="single-item-status-new-message">
+                      {x.unseenMessageCount > 0 && (
+                        <Badge value={x.unseenMessageCount}></Badge>
+                      )}
                     </div>
                   </div>
                 </button>
-              </>
+              </React.Fragment>
             );
           })}
 

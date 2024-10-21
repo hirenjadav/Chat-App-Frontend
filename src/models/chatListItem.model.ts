@@ -9,7 +9,6 @@ export interface ChatListItem {
   profilePicture: string;
   members: ChatMember[];
   latestMessage: MessageDetails;
-  lastSeenMessageId: string;
   unseenMessageCount: number;
 }
 
@@ -29,9 +28,6 @@ export function ChatListItemMapper(chat: any): ChatListItem {
     }
   }
 
-  const lastSeenMessageId = chat.participants.filter(
-    (x: any) => x?.userId == userData?.id
-  )[0].lastSeenMessageId;
   const unseenMessageCount = chat.participants.filter(
     (x: any) => x?.userId == userData?.id
   )[0].unseenMessageCount;
@@ -45,7 +41,6 @@ export function ChatListItemMapper(chat: any): ChatListItem {
       ? chat.participants.map((x: any) => chatMemberMapper(x))
       : [],
     latestMessage: messageDetailsMapper(chat.latestMessage),
-    lastSeenMessageId,
     unseenMessageCount,
   };
 }

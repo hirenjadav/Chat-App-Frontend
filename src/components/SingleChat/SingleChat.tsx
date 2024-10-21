@@ -170,6 +170,7 @@ export default function SingleChat() {
     const params = {
       senderId: userDetails.id,
       status: MESSAGE_STATUS_TYPES.SEEN,
+      conversationId: chatDetails.id,
       messageIds: messages.map((x) => x.id),
     };
 

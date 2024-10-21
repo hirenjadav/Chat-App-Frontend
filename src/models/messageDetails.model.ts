@@ -1,7 +1,6 @@
 export interface MessageDetails {
   id: string;
   messageType: string;
-  messageStatus: string;
   message: string;
   messageAttachment: any;
   messageAttachmentType: string;
@@ -19,7 +18,6 @@ export function messageDetailsMapper(data: any): MessageDetails {
   return {
     id: data.id || null,
     messageType: data.messageType || null,
-    messageStatus: data.messageStatus || null,
     message: data.message || null,
     messageAttachment: data.messageAttachment || null,
     messageAttachmentType: data.messageAttachmentType || null,

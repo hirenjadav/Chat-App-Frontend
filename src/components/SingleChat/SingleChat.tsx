@@ -27,6 +27,7 @@ import { Skeleton } from "primereact/skeleton";
 import EmojiPicker from "emoji-picker-react";
 import { OverlayPanel } from "primereact/overlaypanel";
 import { MESSAGE_STATUS_TYPES } from "../../constants/messageStatusType";
+import ChatInfo from "../ChatInfo/ChatInfo";
 
 export default function SingleChat() {
   const [messageTextField, setMessageTextField] = useState("");
@@ -74,6 +75,13 @@ export default function SingleChat() {
         if (response["status"] == "success") {
           const list: MessageDetails[] = response["data"].map((x: any) =>
             messageDetailsMapper(x)
+          );
+          markMessagesSeen(
+            list.filter(
+              (x) =>
+                x.createdAt.getTime() >=
+                chatDetails.lastSeenMessageTime.getTime()
+            )
           );
           setMessageList(list);
           scrollToBottom();
@@ -167,6 +175,8 @@ export default function SingleChat() {
   };
 
   const markMessagesSeen = (messages: MessageDetails[]) => {
+    if (!messages.length) return;
+
     const params = {
       senderId: userDetails.id,
       status: MESSAGE_STATUS_TYPES.SEEN,
@@ -195,7 +205,7 @@ export default function SingleChat() {
 
   return (
     <div className="single-chat-container">
-      <SingleChatHeader conversationName={chatDetails?.name} />
+      <SingleChatHeader chatDetails={chatDetails} />
 
       {showLoading ? (
         <div className="conversation-chats" ref={divRef}>
@@ -251,22 +261,20 @@ export default function SingleChat() {
   );
 }
 
-const SingleChatHeader = ({ conversationName }: any) => {
+const SingleChatHeader = ({ chatDetails }: { chatDetails: ChatDetails }) => {
   return (
     <div className="conversation-header">
       <div className="conversation-header-picture">
         <Avatar
-          label="V"
+          label={chatDetails.name[0]}
           size="large"
           shape="circle"
           style={{ backgroundColor: "#2196F3", color: "#ffffff" }}
         />
       </div>
-      <div className="conversation-header-name">{conversationName}</div>
+      <div className="conversation-header-name">{chatDetails.name}</div>
       <div className="conversation-header-actions">
-        <Button className="p-1" text>
-          <FontIconWrapper icon="fa-solid fa-circle-info" />
-        </Button>
+        <ChatInfo chatDetails={chatDetails} />
       </div>
     </div>
   );

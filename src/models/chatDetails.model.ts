@@ -7,23 +7,30 @@ export interface ChatDetails {
   name: string;
   profilePicture: string;
   members: ChatMember[];
+  lastSeenMessageTime: Date;
 }
 
 export function ChatDetailsMapper(chat: any): ChatDetails {
+  let userData = null;
+  if (localStorage.getItem("userData")) {
+    userData = JSON.parse(localStorage.getItem("userData")!);
+  }
   if (chat.type == CONVERSATION_TYPES.PERSONAL) {
-    let userData = null;
-    if (localStorage.getItem("userData")) {
-      userData = JSON.parse(localStorage.getItem("userData")!);
-    }
     const participantData =
       chat.participants && chat.participants.length
-        ? chat.participants.filter((x: any) => x?.userId != userData?.id)[0]
+        ? chat.participants.filter((x: any) => x?.id != userData?.id)[0]
         : null;
     if (participantData) {
       chat.name = participantData.fullName;
       chat.profilePicture = participantData.profilePicture;
     }
   }
+
+  const lastSeenMessageTime = new Date(
+    chat.participants.filter((x: any) => x?.id == userData?.id)[0]
+      .lastSeenMessageTime || null
+  );
+
   return {
     id: chat.id || "",
     type: chat.type || "",
@@ -32,5 +39,6 @@ export function ChatDetailsMapper(chat: any): ChatDetails {
     members: chat.participants
       ? chat.participants.map((x) => chatMemberMapper(x))
       : [],
+    lastSeenMessageTime,
   };
 }

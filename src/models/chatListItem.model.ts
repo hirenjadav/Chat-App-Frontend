@@ -20,17 +20,13 @@ export function ChatListItemMapper(chat: any): ChatListItem {
   if (chat.type == CONVERSATION_TYPES.PERSONAL) {
     const participantData =
       chat.participants && chat.participants.length
-        ? chat.participants.filter((x: any) => x?.userId != userData?.id)[0]
+        ? chat.participants.filter((x: any) => x?.id != userData?.id)[0]
         : null;
     if (participantData) {
       chat.name = participantData.fullName;
       chat.profilePicture = participantData.profilePicture;
     }
   }
-
-  const unseenMessageCount = chat.participants.filter(
-    (x: any) => x?.userId == userData?.id
-  )[0].unseenMessageCount;
 
   return {
     id: chat.id || "",
@@ -41,6 +37,6 @@ export function ChatListItemMapper(chat: any): ChatListItem {
       ? chat.participants.map((x: any) => chatMemberMapper(x))
       : [],
     latestMessage: messageDetailsMapper(chat.latestMessage),
-    unseenMessageCount,
+    unseenMessageCount: chat.unseenMessageCount || 0,
   };
 }

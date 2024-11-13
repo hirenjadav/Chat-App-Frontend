@@ -17,11 +17,15 @@ import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { Skeleton } from "primereact/skeleton";
 import { socket } from "../../configs/socket.config";
 import { MESSAGE_EVENTS } from "../../constants/websocketEvents.constant";
-import { messageDetailsMapper } from "../../models/messageDetails.model";
+import {
+  MessageDetails,
+  messageDetailsMapper,
+} from "../../models/messageDetails.model";
 import { ChatDetails } from "../../models/chatDetails.model";
 import { chatDetailsSelector } from "../../state/chatDetailsSlice";
 import { cloneDeep, findIndex } from "lodash";
 import { Badge } from "primereact/badge";
+import { MESSAGE_STATUS_TYPES } from "../../constants/messageStatusType";
 
 interface ChatListProps {
   selectedChatCategory: string;
@@ -105,6 +109,27 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
     };
   });
 
+  const markMessagesRecieved = (messages: MessageDetails[]) => {
+    if (!messages.length) return;
+
+    const params = {
+      senderId: userDetails.id,
+      status: MESSAGE_STATUS_TYPES.RECIEVED,
+      conversationId: chatDetails.id,
+      messageIds: messages.map((x) => x.id),
+    };
+
+    socket.emit(
+      MESSAGE_EVENTS.UPDATE_MESSAGE_STATUS,
+      params,
+      (response: any) => {
+        if (!response.success) {
+          console.error("Failed to mark message seen:", response.error);
+        }
+      }
+    );
+  };
+
   if (showLoading) {
     return (
       <div className="bg-white overflow-hidden p-3 rounded-5">
@@ -155,7 +180,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                       <img src={x.profilePicture} alt="Profile" />
                     ) : (
                       <Avatar
-                        label={"X"}
+                        label={x.name[0]}
                         size="large"
                         shape="circle"
                         style={{ backgroundColor: "#2196F3", color: "#ffffff" }}

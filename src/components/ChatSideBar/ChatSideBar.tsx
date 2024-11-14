@@ -1,6 +1,5 @@
 import { Button } from "primereact/button";
 import FontIconWrapper from "../FontIconWrapper";
-import "./ChatSideBar.scss";
 import authService from "../../services/authService";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -25,14 +24,16 @@ export default function ChatSideBar({
   };
 
   return (
-    <div className="chat-sidebar">
-      <div className="chat-sidebar-buttons">
+    <div className="flex h-full flex-col items-center justify-between bg-white px-3 py-5">
+      <div className="flex flex-col items-center gap-y-4">
         <Button
           text
           onClick={() => handleChatCategoryChange("chats")}
           tooltipOptions={{ disabled: selectedChatCategory == "chats" }}
-          className={`sidebar-button ${
-            selectedChatCategory == "chats" ? "active" : ""
+          className={`flex h-[50px] w-[50px] items-center justify-center rounded-[50%] text-2xl ${
+            selectedChatCategory == "chats"
+              ? "shadow-sm ring-2 ring-white ring-offset-2 ring-offset-[#9dc1fb]"
+              : ""
           }`}
           tooltip="Chats"
         >
@@ -43,8 +44,10 @@ export default function ChatSideBar({
           text
           onClick={() => handleChatCategoryChange("groups")}
           tooltipOptions={{ disabled: selectedChatCategory == "groups" }}
-          className={`sidebar-button ${
-            selectedChatCategory == "groups" ? "active" : ""
+          className={`flex h-[50px] w-[50px] items-center justify-center rounded-[50%] text-2xl ${
+            selectedChatCategory == "groups"
+              ? "shadow-sm ring-2 ring-white ring-offset-2 ring-offset-[#9dc1fb]"
+              : ""
           }`}
           tooltip="Groups"
         >
@@ -67,7 +70,7 @@ export default function ChatSideBar({
         <Button
           text
           onClick={handleLogout}
-          className="sidebar-action-btn"
+          className="p-0 text-2xl"
           tooltip="Logout"
         >
           <FontIconWrapper icon="fa-solid fa-arrow-right-from-bracket" />

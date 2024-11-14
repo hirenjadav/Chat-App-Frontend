@@ -37,10 +37,10 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
   const toast = useRef<Toast>(null);
   const navigate = useNavigate();
   const userDetails: UserDetails | null = useSelector(
-    userDetailsSelector.userDetails
+    userDetailsSelector.userDetails,
   );
   const chatDetails: ChatDetails | null = useSelector(
-    chatDetailsSelector.chatDetails
+    chatDetailsSelector.chatDetails,
   );
 
   useEffect(() => {
@@ -63,7 +63,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
       .then((response) => {
         if (response["status"] == "success") {
           const list: ChatListItem[] = response.data.map((x: any) =>
-            ChatListItemMapper(x)
+            ChatListItemMapper(x),
           );
           setChatList(list);
         } else {
@@ -92,7 +92,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
       const list = cloneDeep(chatList);
       const index = findIndex(
         list,
-        (x) => x.id == mappedMessage.conversationId
+        (x) => x.id == mappedMessage.conversationId,
       );
       if (index > -1) {
         list[index].latestMessage = mappedMessage;
@@ -126,22 +126,19 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
         if (!response.success) {
           console.error("Failed to mark message seen:", response.error);
         }
-      }
+      },
     );
   };
 
   if (showLoading) {
     return (
-      <div className="bg-white overflow-hidden p-3 rounded-5">
+      <div className="rounded-5 overflow-hidden bg-white p-3">
         <CreateNewChat inputDisabled={true} />
 
         <div className="chat-list-container">
           {[1, 1, 1, 1, 1, 1].map((x: number, i: number) => {
             return (
-              <div
-                key={i}
-                className="d-flex column-gap-3 align-items-center mb-3"
-              >
+              <div key={i} className="mb-3 flex items-center gap-x-4">
                 <Skeleton
                   shape="circle"
                   size="3rem"
@@ -161,7 +158,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
   }
 
   return (
-    <div className="bg-white overflow-hidden p-3 rounded-5">
+    <div className="rounded-5 overflow-hidden bg-white p-3">
       <CreateNewChat inputDisabled={false} />
 
       <div className="chat-list-container">
@@ -172,12 +169,12 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                 {index !== 0 && <hr key={`hr-${index}`} className="my-2" />}
                 <button
                   key={`button-${x.id}`}
-                  className="chat-list-single-item"
+                  className="flex w-full gap-x-3 border-none p-2 text-left"
                   onClick={() => handleChatSelection(x, index)}
                 >
-                  <div key={`picture-${x.id}`} className="single-item-picture">
+                  <div key={`picture-${x.id}`} className="overflow-hidden">
                     {x.profilePicture ? (
-                      <img src={x.profilePicture} alt="Profile" />
+                      <img src={x.profilePicture} alt="Profile" className="" />
                     ) : (
                       <Avatar
                         label={x.name[0]}

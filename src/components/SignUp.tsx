@@ -115,24 +115,24 @@ export default function SignUp() {
 
   return (
     <form onSubmit={handleSignUp}>
-      <div className="flex flex-col gap-x-8">
-        <div className="grid grid-cols-2">
-          <div>
+      <div className="flex flex-col gap-y-4">
+        <div className="grid w-full grid-cols-2 gap-x-4">
+          <div className="w-full">
             <label>First Name</label>
             <InputText
               placeholder="Enter First Name"
               value={signUpCredential.firstName}
-              className="w-100"
+              className="w-full"
               onInput={(e) => onInputChange(e, "firstName")}
             />
           </div>
 
-          <div>
+          <div className="w-full">
             <label>Last Name</label>
             <InputText
               placeholder="Enter Last Name"
               value={signUpCredential.lastName}
-              className="w-100"
+              className="w-full"
               onInput={(e) => onInputChange(e, "lastName")}
             />
           </div>
@@ -140,15 +140,15 @@ export default function SignUp() {
 
         <div>
           <label>Email</label>
-          <div className="input-field-wrapper">
+          <div className="relative">
             <FontIconWrapper
               icon="fa-solid fa-envelope"
-              className="input-field-icon"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
             ></FontIconWrapper>
             <InputText
               value={signUpCredential.email}
               placeholder="abc@xyz.com"
-              className="w-100"
+              className="w-full ps-8"
               onInput={(e) => onInputChange(e, "email")}
             />
           </div>
@@ -156,21 +156,21 @@ export default function SignUp() {
 
         <div>
           <label>Phone Number</label>
-          <div className="row">
-            <div className="col-12 col-sm-3">
+          <div className="grid grid-cols-3 gap-x-4">
+            <div className="col-span-1">
               <InputText
                 placeholder="Code"
                 value={signUpCredential.phoneCountryCode}
-                className="w-100"
+                className="w-full"
                 onInput={(e) => onInputChange(e, "phoneCountryCode")}
               />
             </div>
 
-            <div className="col-12 col-sm-9 mt-sm-0 mt-2">
+            <div className="col-span-2">
               <InputText
                 placeholder="Enter Phone Number"
                 value={signUpCredential.phoneNumber}
-                className="w-100"
+                className="w-full"
                 onInput={(e) => onInputChange(e, "phoneNumber")}
               />
             </div>
@@ -179,17 +179,18 @@ export default function SignUp() {
 
         <div>
           <label>Password</label>
-          <div className="input-field-wrapper">
+          <div className="relative">
             <FontIconWrapper
               icon="fa-solid fa-key"
-              className="input-field-icon"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
             ></FontIconWrapper>
             <Password
               value={signUpCredential.password}
               onChange={(e) => onInputChange(e, "password")}
-              className="w-100"
+              className="w-full"
+              pt={{ iconField: { className: "w-full" } }}
               placeholder="************"
-              inputClassName="w-100"
+              inputClassName="w-full ps-8"
               toggleMask={true}
               feedback={false}
             />
@@ -198,17 +199,18 @@ export default function SignUp() {
 
         <div>
           <label>Confirm Password</label>
-          <div className="input-field-wrapper">
+          <div className="relative">
             <FontIconWrapper
               icon="fa-solid fa-key"
-              className="input-field-icon"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
             ></FontIconWrapper>
             <Password
               value={signUpCredential.confirmPassword}
               onChange={(e) => onInputChange(e, "confirmPassword")}
-              className="w-100"
+              className="w-full"
+              pt={{ iconField: { className: "w-full" } }}
               placeholder="************"
-              inputClassName="w-100"
+              inputClassName="w-full ps-8"
               toggleMask={true}
               feedback={false}
             />
@@ -216,7 +218,6 @@ export default function SignUp() {
         </div>
 
         <Button
-          className="mt-4"
           icon="pi pi-check"
           loading={showLoading}
           label="Create Account"

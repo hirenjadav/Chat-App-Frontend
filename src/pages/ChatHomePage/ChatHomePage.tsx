@@ -1,4 +1,3 @@
-import "./ChatHomePage.scss";
 import ChatList from "../../components/ChatList/ChatList";
 import SingleChat from "../../components/SingleChat/SingleChat";
 import ChatSideBar from "../../components/ChatSideBar/ChatSideBar";
@@ -17,7 +16,7 @@ export default function ChatHomePage() {
 
   const dispatch = useDispatch();
   const userDetails: UserDetails | null = useSelector(
-    userDetailsSelector.userDetails
+    userDetailsSelector.userDetails,
   );
 
   useEffect(() => {
@@ -30,16 +29,16 @@ export default function ChatHomePage() {
     setSelectedChatCategory(value);
 
   return (
-    <div className="min-vh-100 h-100 d-flex">
-      <div className="chat-sidebar-container">
+    <div className="flex h-full min-h-screen">
+      <div className="basis-[82px]">
         <ChatSideBar
           selectedChatCategory={selectedChatCategory}
           handleChatCategoryChange={handleChatCategoryChange}
         />
       </div>
-      <div className="chat-home-container">
-        <div className="chat-list">
-          <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="flex flex-grow gap-x-5 p-5">
+        <div>
+          <div className="mb-3 flex items-center justify-between">
             <h3 className="m-0">CHAT APP</h3>
             <div>
               <CreateNewGroup />
@@ -48,7 +47,7 @@ export default function ChatHomePage() {
 
           <ChatList selectedChatCategory={selectedChatCategory} />
         </div>
-        <div className="single-chat">
+        <div className="flex-grow rounded-3xl bg-white p-5">
           <SingleChat />
         </div>
       </div>

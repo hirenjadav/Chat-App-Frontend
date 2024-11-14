@@ -44,7 +44,7 @@ export default function SignUp() {
       | "phoneNumber"
       | "email"
       | "password"
-      | "confirmPassword"
+      | "confirmPassword",
   ) => {
     setsignUpCredential({
       ...signUpCredential,
@@ -115,9 +115,9 @@ export default function SignUp() {
 
   return (
     <form onSubmit={handleSignUp}>
-      <div className="d-flex flex-column row-gap-2">
-        <div className="row">
-          <div className="col-12 col-sm-6">
+      <div className="flex flex-col gap-x-8">
+        <div className="grid grid-cols-2">
+          <div>
             <label>First Name</label>
             <InputText
               placeholder="Enter First Name"
@@ -127,7 +127,7 @@ export default function SignUp() {
             />
           </div>
 
-          <div className="col-12 col-sm-6">
+          <div>
             <label>Last Name</label>
             <InputText
               placeholder="Enter Last Name"
@@ -166,7 +166,7 @@ export default function SignUp() {
               />
             </div>
 
-            <div className="col-12 col-sm-9 mt-2 mt-sm-0">
+            <div className="col-12 col-sm-9 mt-sm-0 mt-2">
               <InputText
                 placeholder="Enter Phone Number"
                 value={signUpCredential.phoneNumber}

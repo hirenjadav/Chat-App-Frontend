@@ -4,7 +4,6 @@ import FontIconWrapper from "../FontIconWrapper";
 import { Button } from "primereact/button";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
-import "./Login.scss";
 import { Password } from "primereact/password";
 import { Toast } from "primereact/toast";
 import { useNavigate } from "react-router-dom";
@@ -90,17 +89,17 @@ export default function Login() {
 
   return (
     <form onSubmit={handleSignIn}>
-      <div className="d-flex flex-column row-gap-2">
+      <div className="flex flex-col gap-y-4">
         <div>
           <label>Email</label>
-          <div className="input-field-wrapper">
+          <div className="relative">
             <FontIconWrapper
               icon="fa-solid fa-user"
-              className="input-field-icon"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
             ></FontIconWrapper>
             <InputText
               placeholder="abc@xyz.com"
-              className="w-100"
+              className="w-full ps-8"
               value={loginCredential.email}
               onInput={(e) => onInputChange(e, "email")}
             />
@@ -109,15 +108,15 @@ export default function Login() {
 
         <div>
           <label>Password</label>
-          <div className="input-field-wrapper">
+          <div className="relative">
             <FontIconWrapper
               icon="fa-solid fa-key"
-              className="input-field-icon"
+              className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
             />
             <Password
               placeholder="************"
-              className="w-100"
-              inputClassName="w-100"
+              className="w-full"
+              inputClassName="w-full ps-8"
               toggleMask
               value={loginCredential.password}
               onChange={(e) => onInputChange(e, "password")}

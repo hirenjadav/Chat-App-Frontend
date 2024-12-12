@@ -4,7 +4,6 @@ import { AutoComplete } from "primereact/autocomplete";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
 import FontIconWrapper from "../FontIconWrapper";
-import "./CreateNewChat.scss";
 import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { ChatDetailsMapper } from "../../models/chatDetails.model";
 import { UserDetails } from "../../models/userDetails.model";
@@ -23,7 +22,7 @@ export default function CreateNewChat({ inputDisabled }: CreateNewChatProps) {
   const [userList, setuserList] = useState<any[]>([]);
   const navigate = useNavigate();
   const userDetails: UserDetails | null = useSelector(
-    userDetailsSelector.userDetails
+    userDetailsSelector.userDetails,
   );
 
   const phoneNumberRegExp: RegExp = /\b\d{10}\b/;
@@ -102,15 +101,18 @@ export default function CreateNewChat({ inputDisabled }: CreateNewChatProps) {
   };
 
   return (
-    <div className="new-chat-input-wrapper">
-      <FontIconWrapper icon="fa-solid fa-magnifying-glass" />
+    <div className="relative">
+      <FontIconWrapper
+        icon="fa-solid fa-magnifying-glass"
+        className="absolute left-3 top-1/2 z-[1] -translate-y-1/2"
+      />
       <AutoComplete
         value={searchField}
         placeholder="Search Chat"
-        className="w-100"
+        className="w-full"
         disabled={inputDisabled}
         loadingIcon="''"
-        inputClassName="w-100 rounded-5 input-field"
+        inputClassName="w-full ps-8 rounded-[15px]"
         field="fullName"
         suggestions={userList}
         completeMethod={(e) => searchFriend(e.query)}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import FontIconWrapper from "../FontIconWrapper";
@@ -9,7 +9,6 @@ import { useSelector } from "react-redux";
 import { AutoComplete } from "primereact/autocomplete";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
-import "./CreateNewGroup.scss";
 import { UserDetails } from "../../models/userDetails.model";
 import { CONVERSATION_TYPES } from "../../constants/conversationTypes.constant";
 import { ChatDetailsMapper } from "../../models/chatDetails.model";
@@ -22,7 +21,7 @@ export default function CreateNewGroup() {
   const navigate = useNavigate();
   const [userSuggestionList, setUserSuggestionList] = useState<any[]>([]);
   const userDetails: UserDetails | null = useSelector(
-    userDetailsSelector.userDetails
+    userDetailsSelector.userDetails,
   );
 
   const [createGroup, setCreateGroup] = useState({
@@ -61,7 +60,7 @@ export default function CreateNewGroup() {
           let list: any[] = response["data"];
           list = list.filter((x) => x.id != userDetails.id);
           list = list.filter(
-            (user) => !userSuggestionList.some((u) => u.id == user.id)
+            (user) => !userSuggestionList.some((u) => u.id == user.id),
           );
           setUserSuggestionList(list);
         } else {
@@ -124,7 +123,7 @@ export default function CreateNewGroup() {
 
   const footerContent = () => {
     return (
-      <div className="d-flex justify-content-end column-gap-3 align-items-center">
+      <div className="flex items-center justify-end gap-x-3">
         <Button
           onClick={() => setVisible(false)}
           label="Cancel"
@@ -163,9 +162,9 @@ export default function CreateNewGroup() {
           setVisible(false);
         }}
       >
-        <div className="d-flex flex-column row-gap-4">
-          <div className="d-flex flex-column row-gap-2">
-            <label className="ps-1">Group Name</label>
+        <div className="flex flex-col gap-y-4">
+          <div className="flex flex-col gap-y-2">
+            <label>Group Name</label>
             <InputText
               value={createGroup.name}
               placeholder="Enter group name"
@@ -174,16 +173,21 @@ export default function CreateNewGroup() {
             />
           </div>
 
-          <div className="d-flex flex-column row-gap-2">
+          <div className="flex flex-col gap-y-2">
             <label>Group Members</label>
             <AutoComplete
               inputId="membersInputId"
               placeholder="Search users"
               value={createGroup.members}
               multiple
-              className="user-selection-field"
+              className="w-full"
               loadingIcon="''"
               field="fullName"
+              pt={{
+                container: {
+                  className: "w-full",
+                },
+              }}
               suggestions={userSuggestionList}
               completeMethod={(e) => searchUsers(e.query)}
               onChange={(e) => onInputChange(e, "members")}

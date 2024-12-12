@@ -23,7 +23,6 @@
     }
 
     &-actions {
-
       & .p-button {
         font-size: 25px;
       }
@@ -39,6 +38,7 @@
     & .single-message-item {
       background-color: white;
       border-radius: 20px;
+      border: 1px solid lightgray;
       padding: 5px 15px 2px 15px;
       width: fit-content;
       margin-bottom: 15px;
@@ -56,6 +56,10 @@
         font-size: 10px;
         text-align: right;
       }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
 
@@ -63,22 +67,22 @@
     position: relative;
     max-width: 650px;
     margin: auto;
-  
+
     & .button-icon {
       padding: 1px;
       font-size: 22px;
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-  
+
       &.attachement {
         left: 10px;
       }
-  
+
       &.emoji {
         right: 50px;
       }
-  
+
       &.send {
         font-size: 20px;
         right: 10px;
@@ -86,7 +90,7 @@
         border-radius: 50%;
       }
     }
-  
+
     & .input-field {
       width: 100%;
       padding: 10px 0;

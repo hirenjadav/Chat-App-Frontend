@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react";
-import "./ChatList.scss";
 import { Toast } from "primereact/toast";
 import httpServices from "../../services/httpServices";
 import API_ENDPOINT_CONSTANTS from "../../constants/apiEndpointConstants";
@@ -132,10 +131,10 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
 
   if (showLoading) {
     return (
-      <div className="rounded-5 overflow-hidden bg-white p-3">
+      <div className="flex flex-grow flex-col gap-y-2 overflow-hidden rounded-[20px] bg-white p-3">
         <CreateNewChat inputDisabled={true} />
 
-        <div className="chat-list-container">
+        <div className="w-[270px] flex-grow">
           {[1, 1, 1, 1, 1, 1].map((x: number, i: number) => {
             return (
               <div key={i} className="mb-3 flex items-center gap-x-4">
@@ -158,10 +157,10 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
   }
 
   return (
-    <div className="rounded-5 overflow-hidden bg-white p-3">
+    <div className="flex flex-grow flex-col gap-y-2 overflow-hidden rounded-[20px] bg-white p-3">
       <CreateNewChat inputDisabled={false} />
 
-      <div className="chat-list-container">
+      <div className="w-[270px] flex-grow">
         {chatList.length > 0 &&
           chatList.map((x: ChatListItem, index: number) => {
             return (
@@ -169,7 +168,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                 {index !== 0 && <hr key={`hr-${index}`} className="my-2" />}
                 <button
                   key={`button-${x.id}`}
-                  className="flex w-full gap-x-3 border-none p-2 text-left"
+                  className="flex w-full gap-x-3 border-none bg-transparent p-2 text-left"
                   onClick={() => handleChatSelection(x, index)}
                 >
                   <div key={`picture-${x.id}`} className="overflow-hidden">
@@ -184,17 +183,20 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                       />
                     )}
                   </div>
-                  <div key={`details-${x.id}`} className="single-item-details">
-                    <div className="single-item-details-name">{x.name}</div>
-                    <div className="single-item-details-message">
+                  <div key={`details-${x.id}`} className="flex-grow">
+                    <div className="text-lg font-semibold">{x.name}</div>
+                    <div className="max-w-[300px] overflow-hidden text-ellipsis whitespace-nowrap text-sm font-normal">
                       {x.latestMessage?.message}
                     </div>
                   </div>
-                  <div key={`status-${x.id}`} className="single-item-status">
-                    <div className="single-item-status-time">
+                  <div
+                    key={`status-${x.id}`}
+                    className="flex flex-col justify-between pt-[3px]"
+                  >
+                    <div className="text-sm font-normal">
                       {x.latestMessage?.messageTime}
                     </div>
-                    <div className="single-item-status-new-message">
+                    <div className="flex justify-end text-sm font-normal">
                       {x.unseenMessageCount > 0 && (
                         <Badge value={x.unseenMessageCount}></Badge>
                       )}

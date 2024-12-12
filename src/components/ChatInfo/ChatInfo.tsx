@@ -1,5 +1,4 @@
 import { Button } from "primereact/button";
-import "./ChatInfo.scss";
 import FontIconWrapper from "../FontIconWrapper";
 import { Sidebar } from "primereact/sidebar";
 import { useState } from "react";

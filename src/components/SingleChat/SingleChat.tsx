@@ -39,10 +39,10 @@ export default function SingleChat() {
   const navigate = useNavigate();
   const divRef = useRef(null);
   const userDetails: UserDetails | null = useSelector(
-    userDetailsSelector.userDetails
+    userDetailsSelector.userDetails,
   );
   const chatDetails: ChatDetails | null = useSelector(
-    chatDetailsSelector.chatDetails
+    chatDetailsSelector.chatDetails,
   );
 
   useEffect(() => {
@@ -74,14 +74,14 @@ export default function SingleChat() {
       .then((response) => {
         if (response["status"] == "success") {
           const list: MessageDetails[] = response["data"].map((x: any) =>
-            messageDetailsMapper(x)
+            messageDetailsMapper(x),
           );
           markMessagesSeen(
             list.filter(
               (x) =>
                 x.createdAt.getTime() >=
-                chatDetails.lastSeenMessageTime.getTime()
-            )
+                chatDetails.lastSeenMessageTime.getTime(),
+            ),
           );
           setMessageList(list);
           scrollToBottom();
@@ -134,7 +134,7 @@ export default function SingleChat() {
     socket.emit(MESSAGE_EVENTS.JOIN_CONVERSATION, chatDetails.id);
 
     socket.on(MESSAGE_EVENTS.RECIEVE_MESSAGE, (newMessage) =>
-      addNewMessage(newMessage)
+      addNewMessage(newMessage),
     );
   };
 
@@ -191,7 +191,7 @@ export default function SingleChat() {
         if (!response.success) {
           console.error("Failed to mark message seen:", response.error);
         }
-      }
+      },
     );
   };
 
@@ -274,7 +274,7 @@ const SingleChatHeader = ({ chatDetails }: { chatDetails: ChatDetails }) => {
       </div>
       <div className="conversation-header-name">{chatDetails.name}</div>
       <div className="conversation-header-actions">
-        <ChatInfo chatDetails={chatDetails} />
+        <ChatInfo />
       </div>
     </div>
   );

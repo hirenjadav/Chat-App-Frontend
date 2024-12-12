@@ -37,7 +37,7 @@ export default function ChatHomePage() {
         />
       </div>
       <div className="flex flex-grow gap-x-5 p-5">
-        <div className="flex flex-col gap-y-3">
+        <div className="flex w-1/4 flex-col gap-y-3">
           <div className="flex items-center justify-between">
             <h3 className="m-0">CHAT APP</h3>
             <div>

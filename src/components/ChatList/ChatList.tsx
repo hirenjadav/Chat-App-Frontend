@@ -134,7 +134,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
       <div className="flex flex-grow flex-col gap-y-2 overflow-hidden rounded-[20px] bg-white p-3">
         <CreateNewChat inputDisabled={true} />
 
-        <div className="w-[270px] flex-grow">
+        <div className="flex-grow">
           {[1, 1, 1, 1, 1, 1].map((x: number, i: number) => {
             return (
               <div key={i} className="mb-3 flex items-center gap-x-4">
@@ -160,7 +160,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
     <div className="flex flex-grow flex-col gap-y-2 overflow-hidden rounded-[20px] bg-white p-3">
       <CreateNewChat inputDisabled={false} />
 
-      <div className="w-[270px] flex-grow">
+      <div className="flex-grow">
         {chatList.length > 0 &&
           chatList.map((x: ChatListItem, index: number) => {
             return (
@@ -168,7 +168,7 @@ export default function ChatList({ selectedChatCategory }: ChatListProps) {
                 {index !== 0 && <hr key={`hr-${index}`} className="my-2" />}
                 <button
                   key={`button-${x.id}`}
-                  className="flex w-full gap-x-3 border-none bg-transparent p-2 text-left"
+                  className="flex w-full cursor-pointer gap-x-3 border-none bg-transparent p-2 text-left"
                   onClick={() => handleChatSelection(x, index)}
                 >
                   <div key={`picture-${x.id}`} className="overflow-hidden">
